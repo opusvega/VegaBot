@@ -1,0 +1,26 @@
+CREATE DATABASE chatbotdb;
+
+USE chatbotdb;
+
+CREATE TABLE incidentlog (incid INT PRIMARY KEY AUTO_INCREMENT UNIQUE,
+						  atmid VARCHAR(255) NOT NULL,
+						  issue VARCHAR(255) NOT NULL,
+						  status VARCHAR(255) NOT NULL,
+						  username VARCHAR(255) NOT NULL,
+						  usercontact VARCHAR(15) NOT NULL,
+						  inctime DATETIME NOT NULL,
+						  restime DATETIME NOT NULL);
+
+
+CREATE TABLE contextlog (id INT AUTO_INCREMENT UNIQUE,
+						 intentname VARCHAR(255) NOT NULL,
+						 sessionid VARCHAR(255) NOT NULL,
+						 sessionflag BOOLEAN NOT NULL,
+						 visit BOOLEAN NOT NULL,
+						 complete BOOLEAN NOT NULL);
+
+INSERT INTO incidentlog (incid, atmid, issue, status,username, usercontact, inctime, restime) VALUES (DEFAULT, 65654, 'printer is not working','In-progress','Parag','8237778888',NOW(), NOW());
+
+DELETE FROM incidentlog WHERE incid = 1;
+
+DROP TABLE incidentlog;
