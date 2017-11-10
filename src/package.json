@@ -1,0 +1,25 @@
+{
+  "name": "remitchatbot",
+  "version": "1.0.0",
+  "description": "A chatbot Server API for fulfilment",
+  "main": "index.js",
+  "scripts": {
+    "test": "remitbot"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pkul3003/opusremitbot.git"
+  },
+  "keywords": [
+    "Opus",
+    "Bot",
+    "Remit",
+    "Bot"
+  ],
+  "author": "Opus Consulting",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/pkul3003/opusremitbot/issues"
+  },
+  "homepage": "https://github.com/pkul3003/opusremitbot#readme"
+}
