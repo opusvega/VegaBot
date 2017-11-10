@@ -1,2 +1,0 @@
-# VegaBot
-Base source code
