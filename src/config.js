@@ -18,9 +18,26 @@ var RemitProducts = RemitProducts.RemitProducts;
 var DaysOfWeek = DaysOfWeek.DaysOfWeek;
 var ErrorMessages = ErrorMessages.ErrorMessages;
 
+var mysqlUrl = "localhost";
+var mysqlUser = "root";
+var mysqlPassword = "root@123";
+var mysqldb = "chatbotdb";
+
+var mongourl = 'mongodb://localhost:27017/chatbotdb';
+var userchatfilepath = "/home/paragku/vega/chatbotsummary/usersays.txt";
+var botchatfilepath = "/home/paragku/vega/chatbotsummary/botsays.txt";
 
 exports.requestConfig = requestConfig;
 exports.ErrorMessages = ErrorMessages;
 exports.PaymentType = PaymentType;
 exports.RemitProducts = RemitProducts;
 exports.DaysOfWeek = DaysOfWeek;
+
+exports.mysqldb = mysqldb;
+exports.mysqlPassword = mysqlPassword;
+exports.mysqlUser = mysqlUser;
+exports.mysqlUrl = mysqlUrl;
+
+exports.mongourl = mongourl;
+exports.userchatfilepath = userchatfilepath;
+exports.botchatfilepath = botchatfilepath;

@@ -1,7 +1,7 @@
 'use strict';
 
 console.log('Entering apiInquiryFunctionsController...before require apihandler');
-
+//******************Remikttance usecase**********************
 // var apihandler = require('../apihandler.js');
 var statusTrackTransfer = require('../../responsestubs/statusTrackTransferStubResponse.js');
 var feeInquiry = require('../../responsestubs/FeeInquiryStubResponse.js');
@@ -9,7 +9,7 @@ var currency = require('../../reflookup/country-currency-code-mapping.js');
 var wait = require('wait.for');
 var express = require('express');
 var bodyParser = require('body-parser');
-var conversationHistory = require('../history/LogHandler.js');
+var conversationHistory = require('../../../history/LogHandler.js');
 var agentLocator_GetCity = require('../../responsestubs/AgentLocator-GetCityStubResponse.js');
 var stubResponse = require("../../responsestubs/StubResponse.js")
 
