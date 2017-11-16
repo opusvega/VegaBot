@@ -5,7 +5,7 @@ var bodyParser = require("body-parser");
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-var router = require('./api/routers/router.js')(app);
+var router = require('./router.js')(app);
 
 var server = app.listen(8082, function () {
 
