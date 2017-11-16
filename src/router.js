@@ -2,8 +2,8 @@
 console.log('Entering router.js...');
 var config = require('./config.js');
 var wait = require('wait.for');
-var apiRemittanceFunctionController = require('./remit/api/controllers/apiInquiryFunctionsController.js');
-var apiAtmFunctionController = require('./atm/api/controllers/apiHandler.js');
+var apiRemittanceFunctionController = require('./remit/api/controllers/remitApiHandler.js');
+var apiAtmFunctionController = require('./atm/api/controllers/atmApiHandler.js');
 
 
 var appRouter = function(app) {
