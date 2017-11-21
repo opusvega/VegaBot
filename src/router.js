@@ -4,6 +4,7 @@ var config = require('./config.js');
 var wait = require('wait.for');
 var apiRemittanceFunctionController = require('./remit/api/controllers/remitApiHandler.js');
 var apiAtmFunctionController = require('./atm/api/controllers/atmApiHandler.js');
+var fs = require('fs');
 
 
 var appRouter = function(app) {
@@ -13,6 +14,11 @@ app.get("/PaymentType", function(req, res) {
     //res.send("Hello World");
     var PaymentType = config.PaymentType;
 	res.send(PaymentType);
+});
+
+app.get("/TwilioVoice",function(req,res){
+     res.set('Content-Type', 'text/xml');
+     res.send(fs.readFileSync('./reflookup/voice.xml', {encoding: 'utf-8'}));
 });
 
 app.get("/RemitProducts", function(req, res) {
@@ -38,9 +44,9 @@ app.post('/hook', function(req, res) {
     //All remittance cases
     if (req.body.result.metadata.intentName == "TrackTransfer") {
 
-        //console.log("inside router app.post: TrackTransfer..." + req.body.result.metadata.intentName);
+        console.log("inside router app.post: TrackTransfer..." + req.body.result.metadata.intentName);
         wait.launchFiber(apiRemittanceFunctionController.handleTrackTransferPost, req, res); //handle in a fiber, keep node spinning
-        //handleTrackTransferPost(req, res);
+        handleTrackTransferPost(req, res);
     }
     if(req.body.result.metadata.intentName.includes("FeeEstimate-MoneyTransfer-Channel")){
         console.log("Entering router FeeEstimate-MoneyTransfer-Channel------>");

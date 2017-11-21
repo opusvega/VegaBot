@@ -39,7 +39,7 @@ function insertMysql(req){
                       " (DEFAULT, "+ATMID+", '"+ISSUE+"','In-progress','"+CUSTOMERNAME+"','"+CONTACT+"',NOW(), NOW());";
             createMysqlConnection().query(sql, function (err, result) {
                     if (err) throw err;
-                    else console.log("1 record inserted");
+                    else console.log("----------1 record inserted----------");
             });
         }
 
@@ -128,6 +128,7 @@ function apiHandlerForReportAtmIncident(req,res){
     var speech = returnJsonObj.speech;
     console.log("Exiting apiHandlerForReportAtmIncident ------>")
     var mongoResponse = logConversationHistory(req, speech);
+    MysqlFunctions.insertContextLog(req);
     return res.json(returnJsonObj);
 }
 
@@ -185,6 +186,7 @@ function apiHandlerForReportAtmIncidentGetIssue(req,res){
         var speech = returnJsonObj.speech;
         console.log("Exiting apiHandlerForReportAtmIncidentGetIssue ------>")
         var mongoResponse = logConversationHistory(req, speech);
+        MysqlFunctions.updateContextLogIntentComplete(req);
         return res.json(returnJsonObj);
     });
 
@@ -211,6 +213,7 @@ function apiHandlerForTrackAtmIncident(req,res){
     var speech = returnJsonObj.speech;
     console.log("Exiting apiHandlerForTrackAtmIncident ------>")
     var mongoResponse = logConversationHistory(req, speech);
+    MysqlFunctions.insertContextLog(req);
     return res.json(returnJsonObj);
 }
 
@@ -244,12 +247,16 @@ function apiHandlerForTrackAtmIncidentGetIncId(req,res){
 
     console.log("Requested INCID status----->"+INCID);
     wait.for(selectStatusMysql, req, function(rows){
+        
+        var startintentname = 'track-atm-incident';
+        MysqlFunctions.updateContextLogEndIntentName(req,startintentname);
         console.log("got rows from callback---->"+rows);
         var returnJsonObj = stubResponse.TrackAtmIncidentGetIncId(rows);
         JSON.stringify(returnJsonObj);
         var speech = returnJsonObj.speech;
         console.log("Exiting apiHandlerForTrackAtmIncidentGetIncId ------>")
         var mongoResponse = logConversationHistory(req, speech);
+        MysqlFunctions.updateContextLogIntentComplete(req);
         return res.json(returnJsonObj);
     });
 }

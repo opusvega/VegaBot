@@ -1,26 +1,52 @@
-CREATE DATABASE chatbotdb;
+-----------------------------***********************************************-------------------------------
 
-USE chatbotdb;
+	CREATE DATABASE chatbotdb;
 
-CREATE TABLE incidentlog (incid INT PRIMARY KEY AUTO_INCREMENT UNIQUE,
-						  atmid VARCHAR(255) NOT NULL,
-						  issue VARCHAR(255) NOT NULL,
-						  status VARCHAR(255) NOT NULL,
-						  username VARCHAR(255) NOT NULL,
-						  usercontact VARCHAR(15) NOT NULL,
-						  inctime DATETIME NOT NULL,
-						  restime DATETIME NOT NULL);
+	USE chatbotdb;
+
+------------------------------***********************************************------------------------------
+
+	CREATE TABLE incidentlog (incid INT PRIMARY KEY AUTO_INCREMENT UNIQUE,
+							  atmid VARCHAR(255) NOT NULL,
+							  issue VARCHAR(255) NOT NULL,
+							  status VARCHAR(255) NOT NULL,
+							  username VARCHAR(255) NOT NULL,
+							  usercontact VARCHAR(15) NOT NULL,
+							  inctime DATETIME NOT NULL,
+							  restime DATETIME NOT NULL);
+
+	INSERT INTO incidentlog (incid, atmid, issue, status,username, usercontact, inctime, restime) VALUES (DEFAULT, 65654, 'printer is not working','In-progress','Parag','8237778888',NOW(), NOW());
+
+	DELETE FROM incidentlog WHERE incid = 1;
+
+	DROP TABLE incidentlog;
+
+-----------------------------************************************************---------------------------------
+
+	CREATE TABLE contextlog (id INT AUTO_INCREMENT UNIQUE,
+							 sessionid VARCHAR(255) NOT NULL,
+							 intentname VARCHAR(255) NOT NULL,
+							 sessionflag BOOLEAN DEFAULT TRUE NOT NULL,
+							 intentvisit BOOLEAN DEFAULT TRUE NOT NULL,
+							 intentcomplete BOOLEAN DEFAULT FALSE NOT NULL);
+
+	INSERT INTO contextlog (id, sessionid, intentname, sessionflag, intentvisit, intentcomplete) VALUES(DEFAULT, 'fgsd55ssd5g', 'welcome', DEFAULT, DEFAULT, DEFAULT);
+
+	ALTER TABLE contextlog MODIFY intentvisit BOOLEAN DEFAULT TRUE NOT NULL;
+
+	ALTER TABLE contextlog ADD COLUMN endintentname VARCHAR(255) NOT NULL AFTER intentname;
+
+	UPDATE contextlog SET intentcomplete = TRUE WHERE sessionid = 'fgsd55ssd5g' AND endintentname = 'welcome';
+
+	SELECT intentname FROM contextlog WHERE sessionid = 'fgsd55ssd5g' AND sessionflag = TRUE AND intentvisit = TRUE AND intentcomplete = FALSE; 
+
+	UPDATE contextlog SET endintentname = '' WHERE sessionid = '' AND intentname = '';
+
+	DROP TABLE contextlog;
 
 
-CREATE TABLE contextlog (id INT AUTO_INCREMENT UNIQUE,
-						 intentname VARCHAR(255) NOT NULL,
-						 sessionid VARCHAR(255) NOT NULL,
-						 sessionflag BOOLEAN NOT NULL,
-						 visit BOOLEAN NOT NULL,
-						 complete BOOLEAN NOT NULL);
 
-INSERT INTO incidentlog (incid, atmid, issue, status,username, usercontact, inctime, restime) VALUES (DEFAULT, 65654, 'printer is not working','In-progress','Parag','8237778888',NOW(), NOW());
+----------------------------**************************************************-------------------------------------
 
-DELETE FROM incidentlog WHERE incid = 1;
-
-DROP TABLE incidentlog;
+	sqlcmd -S myServer\instanceName -i C:\myScript.sql.
+	sqlcmd -S mysql\chatbotdb -i ./contextlog.sql
