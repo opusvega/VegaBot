@@ -7,8 +7,10 @@ var wait = require('wait.for');
 var express = require('express');
 var bodyParser = require('body-parser');
 var conversationHistory = require('../../../history/LogHandler.js');
-var stubResponse = require("../../responsestubs/StubResponse.js")
+var stubResponse = require("../../responsestubs/StubResponse.js");
 var config = require("../../../config.js");
+var MysqlFunctions = require("../../dao/mysql/MysqlFunctions.js");
+var PaymentCloudFunctions = require("../../dao/paymentcloud/getATMTicketAssignment.js")
 var restService = express();
 restService.use(bodyParser.json());
 
@@ -40,7 +42,7 @@ function insertMysql(req){
                     else console.log("1 record inserted");
             });
         }
-            
+
     });
 }
 
@@ -60,9 +62,9 @@ function selectMysql(req,callback){
                     console.log(rows);
                     callback(rows[0].incid);
                 }
-            });   
+            });
         }
-        
+
     });
 }
 //convo log
@@ -165,9 +167,16 @@ function apiHandlerForReportAtmIncidentGetContact(req,res){
 //report-atm-incident-get-issue
 function apiHandlerForReportAtmIncidentGetIssue(req,res){
     console.log("Entering apiHandlerForReportAtmIncidentGetIssue ------>");
-    insertMysql(req);
-    var INCID;
+    // Now connect to the AI helpdesk and get the Technician to be assigned
+    // to the ticket
+    wait.for(PaymentCloudFunctions.getTechnicianDetails, req, function(response){
+    console.log("Inside wait.for...");
+    console.log(response);
+    var technicianName = response;
+      MysqlFunctions.insertIncidentLog(req, technicianName);
+    });
 
+    var INCID;
     wait.for(selectMysql, req, function(incid){
         INCID = incid;
         console.log("incid ...: " + INCID);
@@ -205,6 +214,11 @@ function apiHandlerForTrackAtmIncident(req,res){
     return res.json(returnJsonObj);
 }
 
+//
+function apiHandlerForATMIncidentTicketAssignment(req, res) {
+
+}
+
 function selectStatusMysql(req,callback){
     var INCID = req.body.result.parameters.incid;
     var query = "SELECT atmid, issue, DATE_FORMAT(inctime, '%a %d %b %Y %T' ) inctime, status FROM incidentlog WHERE incid = "+INCID;
@@ -217,9 +231,9 @@ function selectStatusMysql(req,callback){
                     console.log(rows);
                     callback(rows);
                 }
-            });   
+            });
         }
-        
+
     });
 }
 
@@ -227,7 +241,7 @@ function selectStatusMysql(req,callback){
 function apiHandlerForTrackAtmIncidentGetIncId(req,res){
     console.log("Entering apiHandlerForTrackAtmIncidentGetIncId ------>");
     var INCID = req.body.result.parameters.incid;
-    
+
     console.log("Requested INCID status----->"+INCID);
     wait.for(selectStatusMysql, req, function(rows){
         console.log("got rows from callback---->"+rows);

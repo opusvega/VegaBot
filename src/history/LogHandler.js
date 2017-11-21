@@ -10,6 +10,6 @@ function MongoInsert(historyObj){
     		console.log("1 document inserted");
     		db.close();
   		});
-	});	
+	});
 }
 exports.MongoInsert = MongoInsert;
