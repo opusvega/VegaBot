@@ -1,42 +1,45 @@
-var https = require('https');
-var http = require('http');
-var data = { "siteId":"Atlanta", "subject":"reboot", "description":"reboot"};
+
+var reqBody = { "subject":"reboot", "description":"reboot"};
 var Client = require('node-rest-client').Client;
 var res = {};
-var reqJSON = JSON.stringify(data);
-var wait = require('wait.for');
+var reqBody = JSON.stringify(reqBody);
+//var reqJSON = JSON.stringify(data);
 
+function getTechnicianDetails(req, callback) {
+  try{
+    console.log("inside getTechnicianDetails ------->");
+    var endpoint = 'http://10.11.14.4:8080/SampleMLRequest/rest/MLService/requestJSON';
+    //var header = {"Content-Type" : "application/json"};
+    var header = {
+          'Content-Type': 'application/json',
+          'dataType': 'json'
+        };
+    var client = new Client();
+    // set content-type header and data as json in args parameter
+    var args = {
+          data: reqBody,
+          headers: header
+        };
+    console.log("printing args--->");
+    console.log(JSON.stringify(args));
+    client.post(endpoint, args, function (data, response, err) {
+        if (err) throw err;
+        else {
+          // parsed response body as js object
+          console.log("successful post request------>");
+          console.log(data);
+          // raw response
+          console.log(response);
+          var technicianName = JSON.stringify(data.firstTechnicianName);
+          console.log(technicianName);
 
-//var res = getTechnicianDetails(reqJSON, res);
-console.log(res);
-
-function getTechnicianDetails(reqJSON, callback) {
-  var endpoint = 'http://paymentsol.opusconsulting.com:8080/OpusAI_Demo/rest/MLService/requestJSON';
-  var headers = {
-        'Content-Type': 'application/json',
-        'dataType': 'json'
-      };
-  var client = new Client();
-  // set content-type header and data as json in args parameter
-  var args = {
-        data: reqJSON,
-        headers: headers
-      };
-  client.post(endpoint, args, function (data, response, err) {
-      if (err) {
-        console.log("error during http post request to fetch technician details");
-      }
-      else {
-      // parsed response body as js object
-      console.log(data);
-      // raw response
-      //console.log(response);
-      var technicianName = JSON.stringify(data.firstTechnicianName);
-       console.log(technicianName);
-
-      return callback(technicianName);
-    }
-  });
+          callback(err,technicianName);
+        }
+    });  
+  }catch(err){
+    console.log(err);
+  }
+  
 }
 
-console.log(res);
+exports.getTechnicianDetails = getTechnicianDetails;

@@ -36,8 +36,8 @@ var mysqlPassword = "root@123";
 var mysqldb = "chatbotdb";
 
 var mongourl = 'mongodb://localhost:27017/chatbotdb';
-var userchatfilepath = "/home/paragku/vega/chatbotsummary/usersays.txt";
-var botchatfilepath = "/home/paragku/vega/chatbotsummary/botsays.txt";
+var userchatfilepath = "./summary/usersays.txt";
+var botchatfilepath = "./summary/botsays.txt";
 
 exports.requestConfig = requestConfig;
 exports.ErrorMessages = ErrorMessages;

@@ -3,71 +3,19 @@
 console.log('Entering apiHandler...before require apihandler');
 
 var mysql = require('mysql');
-var wait = require('wait.for');
 var express = require('express');
 var bodyParser = require('body-parser');
 var conversationHistory = require('../../../history/LogHandler.js');
 var stubResponse = require("../../responsestubs/StubResponse.js");
 var config = require("../../../config.js");
 var MysqlFunctions = require("../../dao/mysql/MysqlFunctions.js");
-var PaymentCloudFunctions = require("../../dao/paymentcloud/getATMTicketAssignment.js")
+var PaymentCloudFunctions = require("../../dao/paymentcloud/getATMTicketAssignment.js");
+var chatsummary = require("../../../summary/chatsummary.js");
+var MongoFunctions = require("../../dao/mongo/MongoFunctions.js");
 var restService = express();
 restService.use(bodyParser.json());
 
-//mysql connection
-function createMysqlConnection(){
-    var con = mysql.createConnection({
-        host: config.mysqlUrl,
-        user: config.mysqlUser,
-        password: config.mysqlPassword,
-        database : config.mysqldb
-    });
-    return con;
-}
-
-//insert into mysql
-function insertMysql(req){
-    var ATMID = req.body.result.parameters.atmId.atmId;
-    var ISSUE = req.body.result.parameters.issues;
-    var CUSTOMERNAME = req.body.result.parameters.customerName.customerName;
-    var CONTACT = req.body.result.parameters.contact.contact;
-    createMysqlConnection().connect(function(err) {
-        if (err) throw err;
-        else{
-            console.log("Connected!");
-            var sql = "INSERT INTO incidentlog (incid, atmid, issue, status,username, usercontact, inctime, restime) VALUES"+
-                      " (DEFAULT, "+ATMID+", '"+ISSUE+"','In-progress','"+CUSTOMERNAME+"','"+CONTACT+"',NOW(), NOW());";
-            createMysqlConnection().query(sql, function (err, result) {
-                    if (err) throw err;
-                    else console.log("----------1 record inserted----------");
-            });
-        }
-
-    });
-}
-
-//
-function selectMysql(req,callback){
-    var ATMID = req.body.result.parameters.atmId.atmId;
-    var USERNAME = req.body.result.parameters.customerName.customerName;
-    var CONTACT = req.body.result.parameters.contact.contact;
-    var query = "SELECT incid FROM incidentlog WHERE atmid = '"+ATMID+"' AND username = '"+USERNAME+"'"+
-                " AND usercontact = '"+CONTACT+"'";
-    createMysqlConnection().connect(function(err) {
-        if (err) throw err;
-        else{
-            createMysqlConnection().query(query, function (err, rows) {
-                if (err) throw err;
-                else {
-                    console.log(rows);
-                    callback(rows[0].incid);
-                }
-            });
-        }
-
-    });
-}
-//convo log
+//inserting current conversation log in mongodb collection-ConversationLog
 function logConversationHistory(req, speech) {
 
     console.log("Entering logConversationHistory ---->" + req);
@@ -82,12 +30,14 @@ function logConversationHistory(req, speech) {
     var intentValue = req.body.result.metadata.intentName;
         console.log("Printing req.body.metadata.intentName in logConversationHistory : " + req.body.result.metadata.intentName);
     var timestampValue = req.body.timestamp;
+    var sessionId = req.body.sessionId;
 
     var historyLogger = {
             usersays : usersaysValue,
             response : responseValue,
             intent : intentValue,
-            timestamp : timestampValue
+            timestamp : timestampValue,
+            sessionId : sessionId
         }
         conversationHistory.MongoInsert(historyLogger);
 
@@ -119,7 +69,7 @@ function apiHandlerForSmallTalk(req,res){
     return res.json(null);
 }
 
-//ReportingAtmIncident
+//ReportingAtmIncident - start of context
 function apiHandlerForReportAtmIncident(req,res){
     console.log("Entering apiHandlerForReportAtmIncident ------>")
     //var incId = Math.floor(Math.random()*(100000-100)+100);
@@ -165,47 +115,56 @@ function apiHandlerForReportAtmIncidentGetContact(req,res){
     return res.json(returnJsonObj);
 }
 
-//report-atm-incident-get-issue
+//report-atm-incident-get-issue - end of context
 function apiHandlerForReportAtmIncidentGetIssue(req,res){
     console.log("Entering apiHandlerForReportAtmIncidentGetIssue ------>");
     // Now connect to the AI helpdesk and get the Technician to be assigned
     // to the ticket
-    wait.for(PaymentCloudFunctions.getTechnicianDetails, req, function(response){
-    console.log("Inside wait.for...");
-    console.log(response);
-    var technicianName = response;
-      MysqlFunctions.insertIncidentLog(req, technicianName);
-    });
-
     var INCID;
-    wait.for(selectMysql, req, function(incid){
-        INCID = incid;
-        console.log("incid ...: " + INCID);
-        var returnJsonObj = stubResponse.ReportAtmIncidentGetIssue(req,INCID);
-        JSON.stringify(returnJsonObj);
-        var speech = returnJsonObj.speech;
-        console.log("Exiting apiHandlerForReportAtmIncidentGetIssue ------>")
-        var mongoResponse = logConversationHistory(req, speech);
-        MysqlFunctions.updateContextLogIntentComplete(req);
-        return res.json(returnJsonObj);
-    });
-
-   /* selectMysql(req, function(err,incid){
-        if (err) console.log(err);
+    PaymentCloudFunctions.getTechnicianDetails(req, function(err,response){
+        if (err) throw err;
         else{
-            INCID = incid;
+            console.log("Inside wait.for...");
+            console.log(response);
+            var technicianName = response;
+            // MysqlFunctions.insertIncidentLog(req, technicianName,function(err, result){
+            //     if (err) throw err;
+            //     else{
+            //         wait.launchFiber(MysqlFunctions.selectIncidentId, req, function(incid){
+            //             var startintentname = 'report-atm-incident';
+            //             MysqlFunctions.updateContextLogEndIntentName(req,startintentname);
+            //             INCID = incid;
+            //             console.log("incid ...: " + INCID);
+            //             var returnJsonObj = stubResponse.ReportAtmIncidentGetIssue(req,INCID);
+            //             JSON.stringify(returnJsonObj);
+            //             var speech = returnJsonObj.speech;
+            //             console.log("Exiting apiHandlerForReportAtmIncidentGetIssue ------>")
+            //             var mongoResponse = logConversationHistory(req, speech);
+            //             MysqlFunctions.updateContextLogIntentComplete(req);
+            //             return res.json(returnJsonObj);
+            //         });
+            //     }
+            // });
         }
     });
-    console.log("incid ...: " + INCID);
-    var returnJsonObj = stubResponse.ReportAtmIncidentGetIssue(req,INCID);
-    JSON.stringify(returnJsonObj);
-    var speech = returnJsonObj.speech;
-    console.log("Exiting apiHandlerForReportAtmIncidentGetIssue ------>")
-    var mongoResponse = logConversationHistory(req, speech);
-    return res.json(returnJsonObj);*/
+    
+    // var INCID;
+    // wait.for(MysqlFunctions.selectMysql, req, function(incid){
+    //     var startintentname = 'report-atm-incident';
+    //     MysqlFunctions.updateContextLogEndIntentName(req,startintentname);
+    //     INCID = incid;
+    //     console.log("incid ...: " + INCID);
+    //     var returnJsonObj = stubResponse.ReportAtmIncidentGetIssue(req,INCID);
+    //     JSON.stringify(returnJsonObj);
+    //     var speech = returnJsonObj.speech;
+    //     console.log("Exiting apiHandlerForReportAtmIncidentGetIssue ------>")
+    //     var mongoResponse = logConversationHistory(req, speech);
+    //     MysqlFunctions.updateContextLogIntentComplete(req);
+    //     return res.json(returnJsonObj);
+    // });
 }
 
-//track-atm-incident
+//track-atm-incident - start of context
 function apiHandlerForTrackAtmIncident(req,res){
     console.log("Entering apiHandlerForTrackAtmIncident ------>")
     var returnJsonObj = stubResponse.TrackAtmIncident;
@@ -217,47 +176,56 @@ function apiHandlerForTrackAtmIncident(req,res){
     return res.json(returnJsonObj);
 }
 
-//
-function apiHandlerForATMIncidentTicketAssignment(req, res) {
-
-}
-
-function selectStatusMysql(req,callback){
-    var INCID = req.body.result.parameters.incid;
-    var query = "SELECT atmid, issue, DATE_FORMAT(inctime, '%a %d %b %Y %T' ) inctime, status FROM incidentlog WHERE incid = "+INCID;
-    createMysqlConnection().connect(function(err) {
-        if (err) throw err;
-        else{
-            createMysqlConnection().query(query, function (err, rows) {
-                if (err) throw err;
-                else {
-                    console.log(rows);
-                    callback(rows);
-                }
-            });
-        }
-
-    });
-}
-
-//track-atm-incident-get-incid
+//track-atm-incident-get-incid - end of context
 function apiHandlerForTrackAtmIncidentGetIncId(req,res){
     console.log("Entering apiHandlerForTrackAtmIncidentGetIncId ------>");
     var INCID = req.body.result.parameters.incid;
+    var userchatsummary = '';
+    var botchatsummary = '';
 
     console.log("Requested INCID status----->"+INCID);
-    wait.for(selectStatusMysql, req, function(rows){
+    wait.for(MysqlFunctions.selectIncidentStatus, req, function(rows){
         
         var startintentname = 'track-atm-incident';
         MysqlFunctions.updateContextLogEndIntentName(req,startintentname);
         console.log("got rows from callback---->"+rows);
         var returnJsonObj = stubResponse.TrackAtmIncidentGetIncId(rows);
         JSON.stringify(returnJsonObj);
-        var speech = returnJsonObj.speech;
-        console.log("Exiting apiHandlerForTrackAtmIncidentGetIncId ------>")
-        var mongoResponse = logConversationHistory(req, speech);
-        MysqlFunctions.updateContextLogIntentComplete(req);
-        return res.json(returnJsonObj);
+        chatsummary.summary(req, function(err, chatsummary_bot, chatsummary_user){
+            if (err) throw err;
+            else{
+                userchatsummary = chatsummary_user;
+                botchatsummary = chatsummary_bot;
+                returnJsonObj.speech = returnJsonObj.speech + " Your chat summary : " + 
+                               userchatsummary + " and " + botchatsummary;
+                returnJsonObj.displayText = returnJsonObj.speech;
+                var speech = returnJsonObj.speech;
+
+                console.log("Exiting apiHandlerForTrackAtmIncidentGetIncId ------>")
+                var mongoResponse = logConversationHistory(req, speech);
+                MysqlFunctions.updateContextLogIntentComplete(req);
+                return res.json(returnJsonObj);
+            }
+        });
+        
+        // MongoFunctions.findSummary(function(err,result){
+        //     if (err) throw err;
+        //     else{
+        //         userchatsuammary = result[0].chatsummary_user;
+        //         botchatsummary = result[0].chatsummary_bot;
+        //     }
+        // });
+        
+        //var speech = returnJsonObj.speech;
+        // returnJsonObj.speech = returnJsonObj.speech + " Your chat summary : " + 
+        //                        userchatsummary.toString() + " and " + botchatsummary.toString();
+        // returnJsonObj.displayText = returnJsonObj.speech;
+        // var speech = returnJsonObj.speech;
+
+        // console.log("Exiting apiHandlerForTrackAtmIncidentGetIncId ------>")
+        // var mongoResponse = logConversationHistory(req, speech);
+        // MysqlFunctions.updateContextLogIntentComplete(req);
+        // return res.json(returnJsonObj);
     });
 }
 

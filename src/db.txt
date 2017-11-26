@@ -40,7 +40,7 @@
 
 	SELECT intentname FROM contextlog WHERE sessionid = 'fgsd55ssd5g' AND sessionflag = TRUE AND intentvisit = TRUE AND intentcomplete = FALSE; 
 
-	UPDATE contextlog SET endintentname = '' WHERE sessionid = '' AND intentname = '';
+	UPDATE contextlog SET endintentname = '' IF (SESSIONFLAG = TRUE AND intentcomplete = FALSE) WHERE sessionid = '' AND intentname = '' ;
 
 	DROP TABLE contextlog;
 
@@ -50,3 +50,7 @@
 
 	sqlcmd -S myServer\instanceName -i C:\myScript.sql.
 	sqlcmd -S mysql\chatbotdb -i ./contextlog.sql
+
+-------------------------------*****************************************-----------------------------------------
+
+CREATE TABLE ssnbalance (ssn INT PRIMARY KEY, balance INT NOT NULL);
