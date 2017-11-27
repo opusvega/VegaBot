@@ -54,3 +54,5 @@
 -------------------------------*****************************************-----------------------------------------
 
 CREATE TABLE ssnbalance (ssn INT PRIMARY KEY, balance INT NOT NULL);
+CREATE TABLE CustomerBiller (ssn BIGINT, customerbillerid BIGINT, billername VARCHAR(255) NOT NULL, billertype VARCHAR(20) NOT NULL, amtdue INT NOT NULL, duedate DATETIME NOT NULL, autopayrequired VARCHAR(10) NOT NULL, autopaymode VARCHAR(10) NOT NULL, limitamt INT NULL);
+INSERT INTO CustomerBalance VALUES (111, 123456, 'PCG', 'Gas', '50', DEFAULT, 'Yes', 'Full', 0);

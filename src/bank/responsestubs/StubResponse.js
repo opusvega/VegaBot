@@ -46,9 +46,9 @@ function AddBillerResponse(req){
 	var SSN = req.body.result.parameters.SSN;
 	
 	var addBillerResponseStub = {
-		"speech": `Let me confirm your details. Biller name: ${BILLERNAME} , Auto Pay Required: ${AUTOREQUIRED},
+		"speech": `Let me confirm your details. Biller name: ${BILLERNAME} , Auto Pay Required: ${AUTOPAYREQUIRED},
 					Auto Pay Mode: ${AUTOPAYMODE} , Customer id: ${CUSTID} and SSN: ${SSN}. Do you confirm to add the biller?`,
-		"displayText": `Let me confirm your details. Biller name: ${BILLERNAME} , Auto Pay Required: ${AUTOREQUIRED},
+		"displayText": `Let me confirm your details. Biller name: ${BILLERNAME} , Auto Pay Required: ${AUTOPAYREQUIRED},
 		Auto Pay Mode: ${AUTOPAYMODE} , Customer id: ${CUSTID} and SSN: ${SSN}. Do you confirm to add the biller?`,
 		"source": "Opus-NLP"
 

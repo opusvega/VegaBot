@@ -55,7 +55,7 @@ async function checkBillerExistSpeech(req){
     else {
         //*******show list of those billers who have amtdue !=0 
         speech = "You have "+rows.length+" billers registered. ";
-        for(var i =0;i<row.length;i++){
+        for(var i =0;i<rows.length;i++){
             speech = speech + " "+(i+1)+")"+ rows[i].billername + " AMt due : "+ rows[i].amtdue + "Due Date : " + rows[i].duedate;
         }
         speech = speech + ". Which one do you want to pay for? You can also add another biller.";
@@ -67,7 +67,9 @@ async function checkSSN(req){
     //if ssn does not exists => add it to db
     var SSN;
     var rows = await MysqlFunctions.findSSN(req);
-    console.log("back rows are-------->"+rows);
+    console.log("back rows are-------->");
+    console.log(rows)
+    console.log(rows.length);
     if(rows.length == 0){
        SSN = MysqlFunctions.addSSN(req);
     }
@@ -140,11 +142,11 @@ function apiHandlerForAddBillerYes(req,res){
     var returnJsonObj = stubResponse.AddBillerYesResponse(req);
     JSON.stringify(returnJsonObj);
     var result = MysqlFunctions.insertBiller(req);//insert biller to db
-    if(result ==true){
+    if(result === true){
         var speech = returnJsonObj.speech;
     }
     else{
-        var speech = `Cannot Add biller ${BILLERNAME} , Already exists !`;
+        let speech = `Cannot Add biller ${BILLERNAME} , Already exists !`;
         returnJsonObj.speech = speech;
         returnJsonObj.displayText = speech ;
     }
