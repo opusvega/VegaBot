@@ -55,11 +55,11 @@ function ReportAtmIncidentGetContact(req){
 }
 
 //report-atm-incident-get-issue
-function ReportAtmIncidentGetIssue(req,incid){
+function ReportAtmIncidentGetIssue(req,incid,technician){
 	return{
 	"speech": "Thank you for your patience "+req.body.result.parameters.customerName.customerName+
 			  ". I have logged an SLM call for "+req.body.result.parameters.issues+" for ATM"+req.body.result.parameters.atmId.atmId+
-			  " with incident number INC"+incid+". You should also receive an SMS shortly with the call log details."+
+			  " with incident number INC"+incid+" and has been assigned to "+technician+". You should also receive an SMS shortly with the call log details."+
 			  " Is there anything else that I may assist you with?",
 	"displayText": "Thank you for your patience "+req.body.result.parameters.customerName.customerName+
 			  ". I have logged an SLM call for "+req.body.result.parameters.issues+" for ATM"+req.body.result.parameters.atmId.atmId+

@@ -8,7 +8,7 @@ var reqBody = JSON.stringify(reqBody);
 function getTechnicianDetails(req, callback) {
   try{
     console.log("inside getTechnicianDetails ------->");
-    var endpoint = 'http://10.11.14.4:8080/SampleMLRequest/rest/MLService/requestJSON';
+    var endpoint = 'http://localhost:8080/OpusAIDemo/rest/MLService/requestJSON';
     //var header = {"Content-Type" : "application/json"};
     var header = {
           'Content-Type': 'application/json',

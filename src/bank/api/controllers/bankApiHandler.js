@@ -136,12 +136,12 @@ function apiHandlerForAddBiller(req,res){
     return res.json(returnJsonObj);
 }
 //if user confirms to add biller => insert biller to db 
-function apiHandlerForAddBillerYes(req,res){
+async function apiHandlerForAddBillerYes(req,res){
     var BILLERNAME = req.body.result.parameters.Billers;
     console.log("Entering apiHandlerForAddBillerYes ------>")
-    var returnJsonObj = stubResponse.AddBillerYesResponse(req);
+    var returnJsonObj = await stubResponse.AddBillerYesResponse(req);
     JSON.stringify(returnJsonObj);
-    var result = MysqlFunctions.insertBiller(req);//insert biller to db
+    var result = await MysqlFunctions.insertBiller(req);//insert biller to db
     if(result === true){
         var speech = returnJsonObj.speech;
     }
@@ -183,7 +183,7 @@ async function apiHandlerForSelectBillerPayBill(req,res){
         AMT = amount.limitamt;
     }
     if(BALANCE > AMT){
-        await MysqlFunctions.updateBalance(req, AMT);
+        var result = await MysqlFunctions.updateBalance(req, AMT);
         speech = "Your Bill has been paid successfully.";
     }
     else{

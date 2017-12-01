@@ -29,7 +29,7 @@ async function insertBiller(req){
     var query = "SELECT * FROM CustomerBiller WHERE ssn = " +SSN+ " AND billername = '"
                  +BILLERNAME+"' AND billertype = '"+BILLERTYPE+ "';" ;
     var con = await createMysqlConnection();
-    var [result, fields] = await  con.query(query);
+    var [result, fields] = await con.query(query);
 
     if(result.length == 0){ // no such biller and ssn combo exists then add entry
         var sql = "INSERT INTO CustomerBiller (ssn, customerbillerid, billername, billertype, amtdue, duedate, autopayrequired, autopaymode, limitamt) VALUES"+
@@ -78,73 +78,50 @@ async function addSSN(req){
 }
 
 //finds balance of a user using ssn
-function checkBalance(req){
+async function checkBalance(req){
     var SSN = req.body.result.parameters.SSN;
     var query = "SELECT balance from ssnbalance WHERE ssn = "+SSN+";";
-    createMysqlConnection().connect(function(err) {
-        if (err) throw err;
-        else{
-         createMysqlConnection().query(query, function (err, result) {
-             if (err) throw err;
-             else {
-                 console.log(result);
-                 return result[0].balance;
-                  }
-                });
-            }
-            });
+    var con = await createMysqlConnection();
+    var [ result , fields] = await con.query(query);
+    console.log("checkBalance=========>");
+    console.log(result);
+    return result[0].balance;
 }
 
 //function to find amtdue and limit amount for further processing
-function getAmt(req){
+async function getAmt(req){
     var SSN = req.body.result.parameters.SSN;
-    var BILLERNAME = req.body.result.parameters.BillerType;
+    var BILLERNAME = req.body.result.parameters.billers;
     //fetch amtdue and limit amt from db for particular user and biller
-    var query = "SELECT amtdue, limitamt from customerBiller where ssn = "+SSN+ " AND billername = '"+billername+"';"; 
-    createMysqlConnection().connect(function(err) {
-        if (err) throw err;
-        else{
-         createMysqlConnection().query(query, function (err, result) {
-             if (err) throw err;
-             else {
-                 console.log(result);
-                 return result[0];
-                  }
-                });
-            }
-            });
-
+    var query = "SELECT amtdue, limitamt from CustomerBiller where ssn = "+SSN+ " AND billername = '"+BILLERNAME+"';"; 
+    var con = await createMysqlConnection();
+    var [ result , fields] = await con.query(query);
+    console.log("getAmt===============>");
+    console.log(result);
+    return result[0];
 }
 
 //update balance
-function updateBalance(req, AMT){
+async function updateBalance(req, AMT){
     var SSN = req.body.result.parameters.SSN;
-    var BILLERNAME = req.body.result.parameters.BillerType;
-    var query1 = "UPDATE ssnbalance SET balance = balance - " +AMT+ "WHERE ssn = "+SSN+";";//deduct balance from sssnbalance table
-    createMysqlConnection().connect(function(err) {
-        if (err) throw err;
-        else{
-         createMysqlConnection().query(query, function (err, result) {
-             if (err) throw err;
-             else {
-                 console.log(result);
-                  }
-                });
-            }
-            });
+    var BILLERNAME = req.body.result.parameters.billers;
+    var BILLERTYPE = req.body.result.parameters.BillerType;
+    var con = await createMysqlConnection();
+
+    //update ssnbalance table to deduct amt from balance
+    var query1 = "UPDATE ssnbalance SET balance = balance - " +AMT+ " WHERE ssn = "+SSN+";";//deduct balance from sssnbalance table
+    console.log(query1);
+    var result1 = await con.query(query1);
+    console.log("update ssnbalance============>");
+    console.log(result1);
+    
     //update CustomerBiller to deduct amtdue 
-    var query2 = "UPDATE CustomerBiller SET amtdue = amtdue - " +AMT+ "WHERE ssn = "+SSN+ "AND billername = '"+BILLERNAME+"';"
-    createMysqlConnection().connect(function(err) {
-        if (err) throw err;
-        else{
-         createMysqlConnection().query(query, function (err, result) {
-             if (err) throw err;
-             else {
-                 console.log(result);
-                  }
-                });
-            }
-            });
+    var query2 = "UPDATE CustomerBiller SET amtdue = amtdue - " +AMT+ " WHERE ssn = " + SSN + " AND billername = '"+BILLERNAME+
+                 "' AND billertype = '"+BILLERTYPE+"';";
+                 console.log(query2);
+    var result2 = await con.query(query2);
+    console.log("update CustomerBiller==========>");
+    console.log(result2);
 }
 
 

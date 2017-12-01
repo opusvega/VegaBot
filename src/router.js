@@ -4,6 +4,7 @@ var config = require('./config.js');
 var apiRemittanceFunctionController = require('./remit/api/controllers/remitApiHandler.js');
 var apiAtmFunctionController = require('./atm/api/controllers/atmApiHandler.js');
 var apiBankFunctionController = require('./bank/api/controllers/bankApiHandler.js');
+var apiFundFunctionController = require('./fund-transfer/api/controllers/fundApiHandler.js');
 var fs = require('fs');
 
 
@@ -143,9 +144,9 @@ var appRouter = function(app) {
 
         //Bill payment use cases
         if(req.body.result.metadata.intentName == "bill-init-intent"){
-        console.log("Entering router bill-init-intent------>");
-        await apiBankFunctionController.apiHandlerForBillInit(req, res);
-        console.log("Exiting router bill-init-intent------>");
+            console.log("Entering router bill-init-intent------>");
+            await apiBankFunctionController.apiHandlerForBillInit(req, res);
+            console.log("Exiting router bill-init-intent------>");
         }
         if(req.body.result.metadata.intentName == "gas-bill-init-pay"){
             console.log("Entering router gas-bill-init-pay------>");
@@ -183,6 +184,62 @@ var appRouter = function(app) {
             console.log("Exiting select-biller-pay-bill------>");
         }
 
+        //Fund transfer use cases
+        if(req.body.result.metadata.intentName == "transfer-init"){
+            console.log("Entering router transfer-init------>");
+            await apiFundFunctionController.apiHandlerForTransferInit(req, res);
+            console.log("Exiting router transfer-init------>");
+        }
+        if(req.body.result.metadata.intentName == "transfer-get-payee"){
+            console.log("Entering router transfer-get-payee------>");
+            await apiFundFunctionController.apiHandlerForTransferGetPayee(req, res);
+            console.log("Exiting router transfer-get-payee------>");
+        }
+        if(req.body.result.metadata.intentName == "transfer-get-amount"){
+            console.log("Entering router transfer-get-amount------>");
+            await apiFundFunctionController.apiHandlerForTransferGetAmount(req, res);
+            console.log("Exiting router transfer-get-amount------>");
+        }
+        if(req.body.result.metadata.intentName == "transfer-get-otp"){
+            console.log("Entering router transfer-get-otp------>");
+            await apiFundFunctionController.apiHandlerForTransferGetOtp(req, res);
+            console.log("Exiting router transfer-get-otp------>");
+        }
+        if(req.body.result.metadata.intentName == "transfer-get-payee-amount"){
+            console.log("Entering transfer-get-payee-amount------>");
+            await apiFundFunctionController.apiHandlerForTransferGetPayeeAmount(req, res);
+            console.log("Exiting transfer-get-payee-amount------>");
+        }
+        if(req.body.result.metadata.intentName == "add-payee-init"){
+            console.log("Entering router add-payee-init------>");
+            await apiFundFunctionController.apiHandlerForAddPayeeInit(req, res);
+            console.log("Exiting router add-payee-init------>");
+        }
+        if(req.body.result.metadata.intentName == "add-payee-get-payeename"){
+            console.log("Entering add-payee-get-payeename------>");
+            await apiFundFunctionController.apiHandlerForAddPayeeGetPayeename(req, res);
+            console.log("Exiting add-payee-get-payeename------>");
+        }
+        if(req.body.result.metadata.intentName == "add-payee-get-nickname"){
+            console.log("Entering add-payee-get-nickname------>");
+            await apiFundFunctionController.apiHandlerForAddPayeeGetNickname(req, res);
+            console.log("Exiting add-payee-get-nickname------>");
+        }
+        if(req.body.result.metadata.intentName == "add-payee-get-bankname"){
+            console.log("Entering add-payee-get-bankname------>");
+            await apiFundFunctionController.apiHandlerForAddPayeeGetBankname(req, res);
+            console.log("Exiting add-payee-get-bankname------>");
+        }
+        if(req.body.result.metadata.intentName == "add-payee-get-accountnumber"){
+            console.log("Entering add-payee-get-accountnumber------>");
+            await apiFundFunctionController.apiHandlerForAddPayeeGetAccountnumber(req, res);
+            console.log("Exiting add-payee-get-accountnumber------>");
+        }
+        if(req.body.result.metadata.intentName == "add-payee-get-routingnumber"){
+            console.log("Entering add-payee-get-routingnumber------>");
+            await apiFundFunctionController.apiHandlerForAddPayeeGetRoutingnumber(req, res);
+            console.log("Exiting add-payee-get-routingnumber------>");
+        }
         
     }); 
 

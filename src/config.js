@@ -30,6 +30,8 @@ var RemitProducts = RemitProducts.RemitProducts;
 var DaysOfWeek = DaysOfWeek.DaysOfWeek;
 var ErrorMessages = ErrorMessages.ErrorMessages;
 
+var senderUsername = "mk911";
+
 var mysqlUrl = "localhost";
 var mysqlUser = "root";
 var mysqlPassword = "root@123";
@@ -39,12 +41,14 @@ var mongourl = 'mongodb://localhost:27017/chatbotdb';
 var userchatfilepath = "./summary/usersays.txt";
 var botchatfilepath = "./summary/botsays.txt";
 
+
 exports.requestConfig = requestConfig;
 exports.ErrorMessages = ErrorMessages;
 exports.PaymentType = PaymentType;
 exports.RemitProducts = RemitProducts;
 exports.DaysOfWeek = DaysOfWeek;
 //exports.TwilioVoice = TwilioVoice;
+exports.senderUsername = senderUsername;
 
 exports.mysqldb = mysqldb;
 exports.mysqlPassword = mysqlPassword;
