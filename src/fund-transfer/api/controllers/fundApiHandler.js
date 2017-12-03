@@ -52,16 +52,23 @@ async function apiHandlerForTransferInit(req,res){
 async function apiHandlerForTransferGetPayee(req,res){
 	const payee = req.body.result.parameters.payee;
 	console.log('Entering apiHandlerForTransferGetPayee==========>');
-	const returnJsonObj = await stubResponse.TransferGetPayee(req);
+	var returnJsonObj = await stubResponse.TransferGetPayee(req);
 	JSON.stringify(returnJsonObj);
 	var result = await mysqlFunctions.isGetPayeeExist(req);
 	if(result.length == 0){
 		returnJsonObj.speech = returnJsonObj.displayText = `There is no ${payee} registered in your account.
 															Make sure you have entered correctly or go for adding new payee.` ;
 	}
-	if(result.length >= 1){
-		const fbResponse = await util.payeeList(result);
-		returnJsonObj.messages.push(fbResponse);
+	if(result.length == 1){
+		returnJsonObj = await util.payeeList(result,returnJsonObj);
+		returnJsonObj.messages[0].payload.facebook.attachment.payload.template_type = "generic";
+		console.log("Length of payee list is equal to 1");
+	}
+	if(result.length >1){
+		returnJsonObj = await util.payeeList(result,returnJsonObj);
+		returnJsonObj.messages[0].payload.facebook.attachment.payload.template_type = "list";
+		returnJsonObj.messages[0].payload.facebook.attachment.payload.top_element_style = "compact";
+		console.log("Length of payee list is greater than 1");
 	}
 	console.log("response >>>> " + JSON.stringify(returnJsonObj));
 	const speech = returnJsonObj.speech;
@@ -69,6 +76,18 @@ async function apiHandlerForTransferGetPayee(req,res){
 	console.log('Exiting apiHandlerForTransferGetPayee==========>');
 	return res.json(returnJsonObj);
 }
+
+//api handler for "transfer-get-uid" intent
+async function apiHandlerForTransferGetUid(req,res){
+	console.log("Entering apiHandlerForTransferGetUid========>");
+	const returnJsonObj = await stubResponse.TransferGetUid(req);
+	JSON.stringify(returnJsonObj);
+	const speech = returnJsonObj.speech;
+	const mongoResponse = logConversationHistory(req, returnJsonObj.speech);
+	console.log("Exiting apiHandlerForTransferGetUid========>");
+	return res.json(returnJsonObj);
+}
+
 
 //api handler for "transfer-get-amount" intent
 async function apiHandlerForTransferGetAmount(req,res){
@@ -161,8 +180,15 @@ async function apiHandlerForAddPayeeGetAccountnumber(req,res){
 //api handler for "add-payee-get-routingnumber" intent
 async function apiHandlerForAddPayeeGetRoutingnumber(req,res){
 	console.log("Entering apiHandlerForAddPayeeGetRoutingnumber==========>");
-	const returnJsonObj = await stubResponse.AddPayeeGetRoutingnumber(req);
+	var returnJsonObj = await stubResponse.AddPayeeGetRoutingnumber(req);
 	JSON.stringify(returnJsonObj);
+	//INSERT QUERY
+	var result = await mysqlFunctions.insertPayee(req);
+	if (result ==  false){
+		returnJsonObj.speech = "This payee already exists.";
+		returnJsonObj.displayText = returnJsonObj.speech;
+	}
+
 	const speech = returnJsonObj.speech;
 	const mongoResponse = logConversationHistory(req, returnJsonObj.speech);
 	console.log("Exiting apiHandlerForAddPayeeGetRoutingnumber==========>");
@@ -180,3 +206,4 @@ exports.apiHandlerForAddPayeeGetNickname = apiHandlerForAddPayeeGetNickname;
 exports.apiHandlerForAddPayeeGetBankname = apiHandlerForAddPayeeGetBankname;
 exports.apiHandlerForAddPayeeGetAccountnumber = apiHandlerForAddPayeeGetAccountnumber;
 exports.apiHandlerForAddPayeeGetRoutingnumber = apiHandlerForAddPayeeGetRoutingnumber;
+exports.apiHandlerForTransferGetUid = apiHandlerForTransferGetUid;

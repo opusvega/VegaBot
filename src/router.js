@@ -34,7 +34,8 @@ var appRouter = function(app) {
     
 
     app.post('/hook', async function(req, res) {
-        console.log("inside router app.post: "+ JSON.stringify(req.result));
+        console.log("inside router app.post: ");
+        console.log(req.body);
         
         //All remittance cases
         if (req.body.result.metadata.intentName == "TrackTransfer") {
@@ -194,6 +195,11 @@ var appRouter = function(app) {
             console.log("Entering router transfer-get-payee------>");
             await apiFundFunctionController.apiHandlerForTransferGetPayee(req, res);
             console.log("Exiting router transfer-get-payee------>");
+        }
+        if(req.body.result.metadata.intentName == "transfer-get-uid"){
+            console.log("Entering router transfer-get-uid------>");
+            await apiFundFunctionController.apiHandlerForTransferGetUid(req, res);
+            console.log("Exiting router transfer-get-uid------>");
         }
         if(req.body.result.metadata.intentName == "transfer-get-amount"){
             console.log("Entering router transfer-get-amount------>");

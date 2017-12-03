@@ -1,12 +1,4 @@
-async function payeeList(result){
-  var fbResponse = {};
-  fbResponse.attachment = {};
-  fbResponse.attachment.payload = {};
-  /*Facebook*/
-  fbResponse.attachment.type = "template";
-  fbResponse.attachment.payload.template_type = "generic";
-  //fbResponse.attachment.payload.top_element_style = "compact";
-  fbResponse.attachment.payload.elements = [];
+async function payeeList(result,returnJsonObj){
   for (var res in result){
     var fbElementsObj = {};
     const payeeName = result[res].payeename;
@@ -17,18 +9,18 @@ async function payeeList(result){
     const uid = result[res].uid;
     fbElementsObj.title = payeeName;
             fbElementsObj.subtitle = `Nickname : ${nickName}
-             BankName : ${bankName}
-             AccountNumber : ${accountNumber}
-             RoutingNumber : ${routingNumber}`;
+BankName : ${bankName}
+AccountNumber : ${accountNumber}
+RoutingNumber : ${routingNumber}`;
     var button = {};
     button.title = "Proceed";
     button.type = "postback";                        
     button.payload = "UID " + parseInt(uid);  
     fbElementsObj.buttons = [];                    
     fbElementsObj.buttons.push(button);      
-    fbResponse.attachment.payload.elements.push(fbElementsObj);
+    returnJsonObj.messages[0].payload.facebook.attachment.payload.elements.push(fbElementsObj);
   }
-  return fbResponse;
+  return returnJsonObj;
 }
 
 

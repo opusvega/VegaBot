@@ -40,6 +40,27 @@ async function isGetPayeeExist(req){
 	var [result,fields] = await con.query(query);
 	return result;
 }
+async function insertPayee(req){
+	console.log("entered insertPayee======>");
+	const con = await createMysqlConnection();
+	const username = config.senderUsername;
+	const payee = req.body.result.parameters.payee;
+	const nickname = req.body.result.parameters.nickname;
+	const bankname = req.body.result.parameters.bankname;
+	const accountnumber = req.body.result.parameters.accountnumber;
+	const routingnumber = req.body.result.parameters.routingnumber;
+	const query = "INSERT INTO Payee VALUES('"+payee+"','"+nickname+
+				  "','"+bankname+"',"+routingnumber+","+accountnumber+
+				  ",'"+username+"',DEFAULT);";
+	try{
+		const result = await con.query(query);	
+		return true;
+	}
+	catch (err){
+		return false;
+	}
 
+}
 exports.isCustomerPayeeListNull = isCustomerPayeeListNull;
 exports.isGetPayeeExist = isGetPayeeExist;
+exports.insertPayee = insertPayee;

@@ -10,10 +10,36 @@ const TransferInit = {
 function TransferGetPayee(req){
 	const payee = req.body.result.parameters.payee;
 	var response = {
-		"speech": `How much do you want to send to ${payee}?`,
-		"displayText": `How much do you want to send to ${payee}?`,
-		"messages" : [],
-		"source": `Opus-NLP`		
+		"speech": "",
+		"displayText": "",
+		"messages": [
+			{
+				"type": 4,
+				"platform": "facebook",
+				"payload": {
+					"facebook": {
+						"attachment": {
+						    "payload": {
+						      "template_type": "",
+						      "elements": [  ]
+						    },
+					    "type": "template"
+					  }
+					}
+				}
+			}
+		],
+	  "source": "Opus-NLP"	
+	}
+	return response;
+}
+
+//response for "transfer-get-uid" intent and "transfer-get-payee-amount" intent
+function TransferGetUid(req){
+	var response = {
+		"speech": `How much do you want to send to kaustubh?`,
+		"displayText": `How much do you want to send to kaustubh?`,
+		"source": `Opus-NLP`	
 	}
 	return response;
 }
@@ -93,8 +119,9 @@ function AddPayeeGetAccountnumber(req){
 }
 
 //response for "add-payee-get-routingnumber" intent
-function AddPayeeGetRoutingnumber(req){
+async function AddPayeeGetRoutingnumber(req){
 	const payee = req.body.result.parameters.payee;
+	//INSERT Query 
 	var response = {
 		"speech": `${payee} has been added successfully in your account.`,
 		"displayText": `${payee} has been added successfully in your account.`,
@@ -114,3 +141,4 @@ exports.AddPayeeGetNickname = AddPayeeGetNickname;
 exports.AddPayeeGetBankname = AddPayeeGetBankname;
 exports.AddPayeeGetAccountnumber = AddPayeeGetAccountnumber;
 exports.AddPayeeGetRoutingnumber = AddPayeeGetRoutingnumber;
+exports.TransferGetUid = TransferGetUid;
