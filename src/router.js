@@ -1,33 +1,33 @@
 'use strict';
 console.log('Entering router.js...');
-var config = require('./config.js');
-var apiRemittanceFunctionController = require('./remit/api/controllers/remitApiHandler.js');
-var apiAtmFunctionController = require('./atm/api/controllers/atmApiHandler.js');
-var apiBankFunctionController = require('./bank/api/controllers/bankApiHandler.js');
-var apiFundFunctionController = require('./fund-transfer/api/controllers/fundApiHandler.js');
-var fs = require('fs');
+let config = require('./config.js');
+let apiRemittanceFunctionController = require('./remit/api/controllers/remitApiHandler.js');
+let apiAtmFunctionController = require('./atm/api/controllers/atmApiHandler.js');
+let apiBankFunctionController = require('./bank/api/controllers/bankApiHandler.js');
+let apiFundFunctionController = require('./fund-transfer/api/controllers/fundApiHandler.js');
+let fs = require('fs');
 
 
-var appRouter = function(app) {
+let appRouter = function(app) {
     // Configuration and Property Lookup type requests
     app.get("/PaymentType", function(req, res) {
         //res.send("Hello World");
-        var PaymentType = config.PaymentType;
+        let PaymentType = config.PaymentType;
     	res.send(PaymentType);
     });
 
     app.get("/RemitProducts", function(req, res) {
-    	 var RemitProducts = config.RemitProducts;
+    	 let RemitProducts = config.RemitProducts;
     	 res.send(RemitProducts);
     });
     	
     app.get("/DaysOfWeek", function(req, res) {
-    	 var DaysOfWeek = config.DaysOfWeek;
+    	 let DaysOfWeek = config.DaysOfWeek;
     	 res.send(DaysOfWeek);
     });
 
     app.get("/ErrorMessages", function(req, res) {
-    	 var ErrorMessages = config.ErrorMessages;
+    	 let ErrorMessages = config.ErrorMessages;
     	 res.send(ErrorMessages);
     });
 
@@ -60,11 +60,19 @@ var appRouter = function(app) {
             await apiRemittanceFunctionController.apiHandlerForAgentLocatorGetCity(req, res);
             console.log("Exiting router AgentLocator-GetCity------>");
         }
-        if(req.body.result.metadata.intentName.includes("DefaultWelcomeIntent")){
+        if(req.body.result.metadata.intentName == "DefaultWelcomeIntent"){
             console.log("Entering router DefaultWelcomeIntent------>");
             await apiRemittanceFunctionController.apiDefaultWelcomeIntent(req, res);
             console.log("Exiting router DefaultWelcomeIntent------>");
         }
+        if(req.body.result.metadata.intentName == "DefaultWelcomeIntent-get-username"){
+            console.log("Entering router DefaultWelcomeIntent-get-username------>");
+            await apiRemittanceFunctionController.apiDefaultWelcomeIntentGetUsername(req, res);
+            console.log("Exiting router DefaultWelcomeIntent-get-username------>");
+        }
+
+        
+
         if(req.body.result.metadata.intentName == "FeeEstimate"){
             console.log("Entering router FeeEstimate------>");
             await apiRemittanceFunctionController.apiHandlerForFeeEstimate(req, res);
@@ -246,7 +254,12 @@ var appRouter = function(app) {
             await apiFundFunctionController.apiHandlerForAddPayeeGetRoutingnumber(req, res);
             console.log("Exiting add-payee-get-routingnumber------>");
         }
-        
+        //cancelling all intent whose api is in atm api
+        if(req.body.result.metadata.intentName == "cancel-all-intent"){
+            console.log("Entering cancel-all-intent------>");
+            await apiAtmFunctionController.apiHandlerForCancelAllIntent(req, res);
+            console.log("Exiting cancel-all-intent------>");
+        }
     }); 
 
 }

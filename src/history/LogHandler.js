@@ -1,5 +1,5 @@
-var MongoClient = require('mongodb').MongoClient;
-var url = "mongodb://localhost:27017/chatbotdb";
+let MongoClient = require('mongodb').MongoClient;
+let url = "mongodb://localhost:27017/chatbotdb";
 
 //Insert document in collection
 function MongoInsert(historyObj){

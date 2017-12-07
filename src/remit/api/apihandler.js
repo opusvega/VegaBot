@@ -1,12 +1,12 @@
-var config = require('../config.js')
+let config = require('../config.js')
 
 console.log('Inside apihandler.js...');
  
 function apiHandlerForTrackTransfer(req, res, callback){
-	var speech = 'empty speech';
-	var resultText = '';
+	let speech = 'empty speech';
+	let resultText = '';
 	if (req.body) {
-	    var requestBody = req.body;
+	    let requestBody = req.body;
 	    if (requestBody.result) {
 	        speech = '';
 	        if (requestBody.result.fulfillment) {
@@ -19,12 +19,12 @@ function apiHandlerForTrackTransfer(req, res, callback){
 	            speech += ' ';
 	        }
 	        if (requestBody.result.parameters && requestBody.result.parameters.mtcn) {
-	            const MTCN_RECIVED = requestBody.result.parameters.mtcn;
+	            let MTCN_RECIVED = requestBody.result.parameters.mtcn;
 
 	            resultText = config.sampleResponseForMTCN;	            
-	            var searchTrxStatusResponse = resultText["SearchTransactionStatusResponse.2016.12.12"];
-	            var responseCode;
-	            var errorText;
+	            let searchTrxStatusResponse = resultText["SearchTransactionStatusResponse.2016.12.12"];
+	            let responseCode;
+	            let errorText;
 
 	            if (searchTrxStatusResponse) {
 	                errorText = searchTrxStatusResponse["Error.2016.12.12"];
@@ -34,7 +34,7 @@ function apiHandlerForTrackTransfer(req, res, callback){
 	                if (responseCode == "100" || responseCode == "-1" || responseCode == "99") {
 	                    resultText = config.errorMessages.ERROR_RESPONE_TEXT;
 	                } else {
-	                    var status = searchTrxStatusResponse.Status;
+	                    let status = searchTrxStatusResponse.Status;
 
 	                    if (status == "W/C") {
 	                        resultText = "Your money transfer is Available and is Ready for Pickup";
@@ -58,7 +58,7 @@ function apiHandlerForTrackTransfer(req, res, callback){
 	            // Status search using MTCN
 	        } else if (requestBody.result.parameters && requestBody.result.parameters.phonenumber) {
 	            //Status search using Sender's Phone number
-	            const PHONENUMBER_RECIVED = requestBody.result.parameters.phonenumber;
+	            let PHONENUMBER_RECIVED = requestBody.result.parameters.phonenumber;
 
 	            resultText = config.errorMessages.ERROR_RESPONE_TEXT;
 
@@ -67,14 +67,14 @@ function apiHandlerForTrackTransfer(req, res, callback){
 
 	        } else if (requestBody.result.parameters && requestBody.result.parameters.name) {
 	            //Status search using Senders Full Name
-	            const NAME_RECIVED = requestBody.result.parameters.name;
+	            let NAME_RECIVED = requestBody.result.parameters.name;
 
 	            resultText = config.errorMessages.ERROR_RESPONE_TEXT;
 	            speech = "For Sender's name: " + NAME_RECIVED + ", Status: " + resultText;
 	            //Status search using Senders Full Name
 	        }
 
-	        var returnObj = {
+	        let returnObj = {
 	            speech: speech,
 	            displayText: speech,
 	            source: 'apiai-webhook-sample',

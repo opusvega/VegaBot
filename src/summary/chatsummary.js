@@ -2,21 +2,21 @@
 Function Name: Build Text Summary of the conversation for a session
 */
 
-var MongoClient = require('mongodb').MongoClient;
-var express = require('express');
-var app = express();
-var fs = require('fs');
-var cmd=require('node-cmd');
-var config=require('../config.js');
+let MongoClient = require('mongodb').MongoClient;
+let express = require('express');
+let app = express();
+let fs = require('fs');
+let cmd=require('node-cmd');
+let config=require('../config.js');
 
 // Connection URL
-var url = config.mongourl;
+let url = config.mongourl;
 
 
 function summary(req, callback){
   //'mongodb://localhost:27017/chatbotdb';
   //Start Connection to Mongo DB
-  var sessionId = req.body.sessionId;
+  let sessionId = req.body.sessionId;
   MongoClient.connect(url,function(err,db){
     if(err){
       console.log("ERROR Connectingto DB!!!");
@@ -33,9 +33,9 @@ function summary(req, callback){
       else{
         console.log("Following are the records------->");
         console.log(docs);
-        var usersaysconcat = " ";
-        var botsaysconcat = " ";
-        //combining all user's and bot's response into respective variables
+        let usersaysconcat = " ";
+        let botsaysconcat = " ";
+        //combining all user's and bot's response into respective letiables
         docs.forEach(function(docline){
           usersaysconcat = usersaysconcat + " " + docline.usersays.toString();
           botsaysconcat = botsaysconcat + " " + docline.response.toString();
@@ -59,8 +59,8 @@ function summary(req, callback){
       }
     });
 
-    var chatbotsummary_user = " ";//to store user summary
-    var chatbotsummary_bot = " ";//to store bot summary
+    let chatbotsummary_user = " ";//to store user summary
+    let chatbotsummary_bot = " ";//to store bot summary
     // run command to summarize user chats using ots tool
     cmd.get(
       `ots ${config.userchatfilepath}`,

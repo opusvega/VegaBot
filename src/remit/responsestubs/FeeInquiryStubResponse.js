@@ -1,4 +1,4 @@
-var FeeInquiryStubResponse = {
+let FeeInquiryStubResponse = {
 
 "speech": "Total Fee Estimate to transfer $500 from zip code 10022 to India is $20",
 "displayText": "Total Fee Estimate to transfer $500 from zip code 10022 to India is $20",

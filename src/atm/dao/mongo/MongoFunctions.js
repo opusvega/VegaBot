@@ -1,6 +1,6 @@
-var MongoClient = require('mongodb').MongoClient;
-var config=require('../../../config.js');
-var url = config.mongourl;
+let MongoClient = require('mongodb').MongoClient;
+let config=require('../../../config.js');
+let url = config.mongourl;
 
 //fetching the stored userchatsummary and botchatsummary in SessionLog
 function findSummary(callback){

@@ -1,4 +1,4 @@
-var agentLocator_GetCity ={
+let agentLocator_GetCity ={
       "speech": " ",
       "source": "apiai-webhook-sample",
       "displayText": " ",

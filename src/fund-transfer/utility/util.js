@@ -1,12 +1,12 @@
 async function payeeList(result,returnJsonObj){
   for (var res in result){
     var fbElementsObj = {};
-    const payeeName = result[res].payeename;
-    const nickName = result[res].nickname;
-    const bankName = result[res].bankname;
-    const accountNumber = result[res].accountnumber;
-    const routingNumber = result[res].routingnumber;
-    const uid = result[res].uid;
+    let payeeName = result[res].payeename;
+    let nickName = result[res].nickname;
+    let bankName = result[res].bankname;
+    let accountNumber = result[res].accountnumber;
+    let routingNumber = result[res].routingnumber;
+    let uid = result[res].uid;
     fbElementsObj.title = payeeName;
             fbElementsObj.subtitle = `Nickname : ${nickName}
 BankName : ${bankName}

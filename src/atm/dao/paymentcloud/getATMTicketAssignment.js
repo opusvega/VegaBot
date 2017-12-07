@@ -1,22 +1,22 @@
 
-var reqBody = { "subject":"reboot", "description":"reboot"};
-var Client = require('node-rest-client').Client;
-var res = {};
-var reqBody = JSON.stringify(reqBody);
-//var reqJSON = JSON.stringify(data);
+let reqBodyNew = { "subject":"reboot", "description":"reboot"};
+let Client = require('node-rest-client').Client;
+let res = {};
+let reqBody = JSON.stringify(reqBodyNew);
+//let reqJSON = JSON.stringify(data);
 
 function getTechnicianDetails(req, callback) {
   try{
     console.log("inside getTechnicianDetails ------->");
-    var endpoint = 'http://localhost:8080/OpusAIDemo/rest/MLService/requestJSON';
-    //var header = {"Content-Type" : "application/json"};
-    var header = {
+    let endpoint = 'http://localhost:8080/OpusAIDemo/rest/MLService/requestJSON';
+    //let header = {"Content-Type" : "application/json"};
+    let header = {
           'Content-Type': 'application/json',
           'dataType': 'json'
         };
-    var client = new Client();
+    let client = new Client();
     // set content-type header and data as json in args parameter
-    var args = {
+    let args = {
           data: reqBody,
           headers: header
         };
@@ -30,7 +30,7 @@ function getTechnicianDetails(req, callback) {
           console.log(data);
           // raw response
           console.log(response);
-          var technicianName = JSON.stringify(data.firstTechnicianName);
+          let technicianName = JSON.stringify(data.firstTechnicianName);
           console.log(technicianName);
 
           callback(err,technicianName);

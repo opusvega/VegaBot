@@ -2,32 +2,33 @@
 
 console.log('Entering apiInquiryFunctionsController...before require apihandler');
 //******************Remikttance usecase**********************
-// var apihandler = require('../apihandler.js');
-var statusTrackTransfer = require('../../responsestubs/statusTrackTransferStubResponse.js');
-var feeInquiry = require('../../responsestubs/FeeInquiryStubResponse.js');
-var currency = require('../../../reflookup/country-currency-code-mapping.js');
-var express = require('express');
-var bodyParser = require('body-parser');
-var conversationHistory = require('../../../history/LogHandler.js');
-var agentLocator_GetCity = require('../../responsestubs/AgentLocator-GetCityStubResponse.js');
-var stubResponse = require("../../responsestubs/StubResponse.js")
+// let apihandler = require('../apihandler.js');
+let statusTrackTransferNew = require('../../responsestubs/statusTrackTransferStubResponse.js');
+let feeInquiryNew = require('../../responsestubs/FeeInquiryStubResponse.js');
+let currency = require('../../../reflookup/country-currency-code-mapping.js');
+let express = require('express');
+let bodyParser = require('body-parser');
+let conversationHistory = require('../../../history/LogHandler.js');
+let agentLocator_GetCityNew = require('../../responsestubs/AgentLocator-GetCityStubResponse.js');
+let stubResponse = require("../../responsestubs/StubResponse.js")
+let mysqlFunctions = require("../../../mysql-functions/mysqlFunctions.js");
 
-var restService = express();
+let restService = express();
 restService.use(bodyParser.json());
-var statusTrackTransfer = statusTrackTransfer.sampleResponseForMTCN;
-var feeInquiry = feeInquiry.FeeInquiryStubResponse;
-var agentLocator_GetCity = agentLocator_GetCity.agentLocator_GetCity;
-var welcomeResponse = stubResponse.WelcomeStubResponse;
-var agentLocator = stubResponse.AgentLocator;
-var feeEstimate = stubResponse.FeeEstimate;
-var feeEstimateBillPay = stubResponse.FeeEstimateBillPay;
-var feeEstimateMoneyTransferGetCountry = stubResponse.FeeEstimateMoneyTransferGetCountry;
-var feeEstimateMoneyTransferGetZipCode = stubResponse.FeeEstimateMoneyTransferGetZipCode;
-var feeEstimateMoneyTransferGetAmount = stubResponse.FeeEstimateMoneyTransferGetAmount;
+let statusTrackTransfer = statusTrackTransferNew.sampleResponseForMTCN;
+let feeInquiry = feeInquiryNew.FeeInquiryStubResponse;
+let agentLocator_GetCity = agentLocator_GetCityNew.agentLocator_GetCity;
+//let welcomeResponse = stubResponse.WelcomeStubResponse;
+let agentLocator = stubResponse.AgentLocator;
+let feeEstimate = stubResponse.FeeEstimate;
+let feeEstimateBillPay = stubResponse.FeeEstimateBillPay;
+let feeEstimateMoneyTransferGetCountry = stubResponse.FeeEstimateMoneyTransferGetCountry;
+let feeEstimateMoneyTransferGetZipCode = stubResponse.FeeEstimateMoneyTransferGetZipCode;
+let feeEstimateMoneyTransferGetAmount = stubResponse.FeeEstimateMoneyTransferGetAmount;
 
 console.log('Inside apiInquiryFunctionsController...');
 console.log("Printing statusTrackTransfer1: " + statusTrackTransfer);
-//var restService = express();
+//let restService = express();
 //restService.use(bodyParser.json());
 
 console.log('Inside apiInquiryFunctionsController... after restService.use');
@@ -38,16 +39,16 @@ function logConversationHistory(req, speech) {
     console.log("Printing req.body.metadata.intentName in logConversationHistory : " + req.body.result.metadata.intentName);
     console.log(" speech : " + speech);
 
-    var logResponse = "";
+    let logResponse = "";
 
-    var usersaysValue = req.body.result.resolvedQuery;
+    let usersaysValue = req.body.result.resolvedQuery;
         console.log("usersaysValue in logConversationHistory : " + usersaysValue);
-    var responseValue = speech;
-    var intentValue = req.body.result.metadata.intentName;
+    let responseValue = speech;
+    let intentValue = req.body.result.metadata.intentName;
         console.log("Printing req.body.metadata.intentName in logConversationHistory : " + req.body.result.metadata.intentName);
-    var timestampValue = req.body.timestamp;
+    let timestampValue = req.body.timestamp;
 
-    var historyLogger = {
+    let historyLogger = {
             usersays : usersaysValue,
             response : responseValue,
             intent : intentValue,
@@ -63,19 +64,19 @@ function logConversationHistory(req, speech) {
 function handleTrackTransferPost(req, res) {
     console.log("Inside handleTrackTransferPost function...");
     try {
-        var speech = 'empty speech';
-//        var returnJsonObj = apihandler.apiHandlerForTrackTransfer(req,res);
+        let speech = 'empty speech';
+//        let returnJsonObj = apihandler.apiHandlerForTrackTransfer(req,res);
         console.log("Printing statusTrackTransfer2: " + statusTrackTransfer);
-        var returnJsonObj = statusTrackTransfer;
+        let returnJsonObj = statusTrackTransfer;
         JSON.stringify(returnJsonObj);
 
-        var speech = returnJsonObj.speech;
+        let speech = returnJsonObj.speech;
 
         console.log("before calling logConversationHistory ...");
 
         console.log("Printing req : " + req.body.result.metadata.intentName);
 
-        var mongoResponse = logConversationHistory(req, speech);
+        let mongoResponse = logConversationHistory(req, speech);
 
         return res.json(returnJsonObj);
     } catch (err) {
@@ -92,11 +93,11 @@ function handleTrackTransferPost(req, res) {
 //AgentLocator-GetCity
 function apiHandlerForAgentLocatorGetCity(req, res) {
 
-    var speech = 'empty speech';
-    var speechAudio;
-    var priceData;
-    var requestBody = req.body;
-    const paramObj = {};
+    let speech = 'empty speech';
+    let speechAudio;
+    let priceData;
+    let requestBody = req.body;
+    let paramObj = {};
     console.log(JSON.stringify(requestBody.result));
     if(requestBody.result.parameters.latitude && requestBody.result.parameters.longitude){
         paramObj.CityName = 'you';
@@ -114,7 +115,7 @@ function apiHandlerForAgentLocatorGetCity(req, res) {
     
     console.log('Creating agentList-------->'+JSON.stringify(agentLocator_GetCity));
     
-    var agentList = agentLocator_GetCity.messages[0].payload.facebook.attachment.payload.elements[0].title+'\n'+
+    let agentList = agentLocator_GetCity.messages[0].payload.facebook.attachment.payload.elements[0].title+'\n'+
                     agentLocator_GetCity.messages[0].payload.facebook.attachment.payload.elements[0].subtitle+'\n'+
                     agentLocator_GetCity.messages[0].payload.facebook.attachment.payload.elements[1].title+'\n'+
                     agentLocator_GetCity.messages[0].payload.facebook.attachment.payload.elements[1].subtitle+'\n';
@@ -128,7 +129,7 @@ function apiHandlerForAgentLocatorGetCity(req, res) {
     agentLocator_GetCity.messages[1].speech = speech;
     console.log('Final agentLocator_GetCity--->'+JSON.stringify(agentLocator_GetCity));
 
-    var returnJsonObj = agentLocator_GetCity;
+    let returnJsonObj = agentLocator_GetCity;
     
     console.log('Final returnJsonObj--->'+JSON.stringify(returnJsonObj));
     
@@ -138,11 +139,11 @@ function apiHandlerForAgentLocatorGetCity(req, res) {
     //agentLocator_GetCity.data.google.rich_response.items[0].simpleResponse.textToSpeech = agentLocator_GetCity.data.google.rich_response.items[0].simpleResponse.displayText = speech;
 
     JSON.stringify(returnJsonObj);
-    //var speech = returnJsonObj.speech;
+    //let speech = returnJsonObj.speech;
     console.log("before calling logConversationHistory ... speech : " + speech);
 
     console.log("Printing req : " + req.body.result.metadata.intentName);
-    var mongoResponse = logConversationHistory(req, speech);
+    let mongoResponse = logConversationHistory(req, speech);
 
     return res.json(returnJsonObj);
 
@@ -153,13 +154,13 @@ function apiHandlerForAgentLocatorGetCity(req, res) {
 //Fee Inquiry
 function apiHandlerForFeeInquiry(req, res) {
 
-    var speech = 'empty speech';
-    var speechAudio;
-    var priceData;
+    let speech = 'empty speech';
+    let speechAudio;
+    let priceData;
 
-    var requestBody = req.body;
+    let requestBody = req.body;
 
-    const paramObj = {};
+    let paramObj = {};
             paramObj.TO_COUNTRY = requestBody.result.parameters.destCountry["alpha-2"];
             paramObj.FROM_ZIP_CODE = requestBody.result.parameters.zipCode;
             paramObj.AMOUNT = requestBody.result.parameters.amount;
@@ -176,102 +177,138 @@ function apiHandlerForFeeInquiry(req, res) {
     feeInquiry.messages[4].speech = speech;
     feeInquiry.data.google.rich_response.items[0].simpleResponse.textToSpeech = feeInquiry.data.google.rich_response.items[0].simpleResponse.displayText = speech;
 
-    var intentValue = requestBody.result.metadata.intentName;
+    let intentValue = requestBody.result.metadata.intentName;
     if(intentValue == 'FeeEstimate-MoneyTransfer-Channel-AGT'){
         feeInquiry.messages[3].speech = "\nDo want to see nearby agents? (Yes/No)";
     }
     else{
         feeInquiry.messages[3].speech = "";
     }
-    var returnJsonObj = feeInquiry;
+    let returnJsonObj = feeInquiry;
 
     JSON.stringify(returnJsonObj);
 
-    var speech = returnJsonObj.speech;
+    let speech = returnJsonObj.speech;
 
     console.log("before calling logConversationHistory ... speech : " + speech);
 
     console.log("Printing req : " + req.body.result.metadata.intentName);
-    var mongoResponse = logConversationHistory(req, speech);
+    let mongoResponse = logConversationHistory(req, speech);
     
     return res.json(returnJsonObj);
 
     
 }
 
+
+
 //Welcome Intent
-function apiDefaultWelcomeIntent(req,res){
+async function apiDefaultWelcomeIntent(req,res){
     console.log("Entering apiDefaultWelcomeIntent ------>")
-    var returnJsonObj = welcomeResponse;
+    //let returnJsonObj = stubResponse.WelcomeStubResponse;
+    let returnJsonObj = {
+        "speech": "Welcome to Opus. My name is Vega. How can I help you?",
+        "displayText": "Welcome to Opus. My name is Vega. How can I help you?",
+        "source": "Opus-NLP"
+    }
     JSON.stringify(returnJsonObj);
-    var speech = returnJsonObj.speech;
-    console.log("Exiting apiDefaultWelcomeIntent ------>")
-    var mongoResponse = logConversationHistory(req, speech);
+    console.log(returnJsonObj);
+    let result = await mysqlFunctions.checkIfSessionIdPresent(req);
+    if(result.length == 0){
+        returnJsonObj.speech = "Hi there! Please tell me your username to proceed further.";
+        returnJsonObj.displayText = returnJsonObj.speech;
+    }
+    let speech = returnJsonObj.speech;
+    console.log("Exiting apiDefaultWelcomeIntent ------>");
+    console.log(returnJsonObj);
+    let mongoResponse = logConversationHistory(req, speech);
+    return res.json(returnJsonObj);
+}
+
+async function apiDefaultWelcomeIntentGetUsername(req,res){
+    console.log("Entering apiDefaultWelcomeIntentGetUsername ------>")
+    let result = await mysqlFunctions.insertSessionId(req);
+    //let returnJsonObj = stubResponse.WelcomeStubResponseGetUsername;
+    let returnJsonObj = {
+        "speech": "Welcome to Opus. My name is Vega. How can I help you?",
+        "displayText": "Welcome to Opus. My name is Vega. How can I help you?",
+        "source": "Opus-NLP"
+    }
+    JSON.stringify(returnJsonObj);
+    console.log(returnJsonObj);
+    if(result[0].affectedRows == 0){
+        returnJsonObj.speech = "It seems you have entered worng username. Please try again.";
+        returnJsonObj.displayText = returnJsonObj.speech;
+    }
+    let speech = returnJsonObj.speech;
+    console.log("Exiting apiDefaultWelcomeIntentGetUsername ------>")
+    console.log(returnJsonObj);
+    let mongoResponse = logConversationHistory(req, speech);
     return res.json(returnJsonObj);
 }
 
 //Agent Locator
 function apiHandlerForAgentLocator(req,res){
     console.log("Entering apiHandlerForAgentLocator ------>")
-    var returnJsonObj = agentLocator;
+    let returnJsonObj = agentLocator;
     JSON.stringify(returnJsonObj);
-    var speech = returnJsonObj.speech;
+    let speech = returnJsonObj.speech;
     console.log("Exiting apiHandlerForAgentLocator ------>")
-    var mongoResponse = logConversationHistory(req, speech);
+    let mongoResponse = logConversationHistory(req, speech);
     return res.json(returnJsonObj);
 }
 
 //FeeEstimate
 function apiHandlerForFeeEstimate(req,res){
     console.log("Entering apiHandlerForFeeEstimate ------>")
-    var returnJsonObj = feeEstimate;
+    let returnJsonObj = feeEstimate;
     JSON.stringify(returnJsonObj);
-    var speech = returnJsonObj.speech;
+    let speech = returnJsonObj.speech;
     console.log("Exiting apiHandlerForFeeEstimate ------>")
-    var mongoResponse = logConversationHistory(req, speech);
+    let mongoResponse = logConversationHistory(req, speech);
     return res.json(returnJsonObj);
 }
 
 //FeeEstimate-BillPay
 function apiHandlerForFeeEstimateBillPay(req,res){
     console.log("Entering apiHandlerForFeeEstimateBillPay ------>")
-    var returnJsonObj = feeEstimateBillPay;
+    let returnJsonObj = feeEstimateBillPay;
     JSON.stringify(returnJsonObj);
-    var speech = returnJsonObj.speech;
+    let speech = returnJsonObj.speech;
     console.log("Exiting apiHandlerForFeeEstimateBillPay ------>")
-    var mongoResponse = logConversationHistory(req, speech);
+    let mongoResponse = logConversationHistory(req, speech);
     return res.json(returnJsonObj);
 }
 
 //FeeEstimate-MoneyTransfer-GetCountry
 function apiHandlerForFeeEstimateMoneyTransferGetCountry(req,res){
     console.log("Entering apiHandlerForFeeEstimateMoneyTransferGetCountry ------>")
-    var returnJsonObj = feeEstimateMoneyTransferGetCountry;
+    let returnJsonObj = feeEstimateMoneyTransferGetCountry;
     returnJsonObj.speech = "From which zip code do you want to send the money to "+req.body.result.parameters.destCountry.name+"?";
     returnJsonObj.displayText = "From which zip code do you want to send the money to "+req.body.result.parameters.destCountry.name+"?";
     returnJsonObj.data.facebook[0].text = "From which zip code do you want to send the money to "+req.body.result.parameters.destCountry.name+"?";
     JSON.stringify(returnJsonObj);
-    var speech = returnJsonObj.speech;
+    let speech = returnJsonObj.speech;
     console.log("Exiting apiHandlerForFeeEstimateMoneyTransferGetCountry ------>")
-    var mongoResponse = logConversationHistory(req, speech);
+    let mongoResponse = logConversationHistory(req, speech);
     return res.json(returnJsonObj);
 }
 
 //FeeEstimate-MoneyTransfer-GetZipCode
 function apiHandlerForFeeEstimateMoneyTransferGetZipCode(req,res){
     console.log("Entering apiHandlerForFeeEstimateMoneyTransferGetZipCode ------>")
-    var returnJsonObj = feeEstimateMoneyTransferGetZipCode;
+    let returnJsonObj = feeEstimateMoneyTransferGetZipCode;
     JSON.stringify(returnJsonObj);
-    var speech = returnJsonObj.speech;
+    let speech = returnJsonObj.speech;
     console.log("Exiting apiHandlerForFeeEstimateMoneyTransferGetZipCode ------>")
-    var mongoResponse = logConversationHistory(req, speech);
+    let mongoResponse = logConversationHistory(req, speech);
     return res.json(returnJsonObj);
 }
 
 //FeeEstimate-MoneyTransfer-GetAmount
 function apiHandlerForFeeEstimateMoneyTransferGetAmount(req,res){
     console.log("Entering apiHandlerForFeeEstimateMoneyTransferGetAmount ------>")
-    var returnJsonObj = feeEstimateMoneyTransferGetAmount;
+    let returnJsonObj = feeEstimateMoneyTransferGetAmount;
     returnJsonObj.speech = "How would you like to transfer" + 
                             req.body.result.parameters.amount.currency +
                             " " + 
@@ -283,9 +320,9 @@ function apiHandlerForFeeEstimateMoneyTransferGetAmount(req,res){
                             req.body.result.parameters.amount.amount + 
                             " You can say: \n Send online \n Send by phone \n Send in person \n Send by mobile app";
     JSON.stringify(returnJsonObj);
-    var speech = returnJsonObj.speech;
+    let speech = returnJsonObj.speech;
     console.log("Exiting apiHandlerForFeeEstimateMoneyTransferGetAmount ------>")
-    var mongoResponse = logConversationHistory(req, speech);
+    let mongoResponse = logConversationHistory(req, speech);
     return res.json(returnJsonObj);
 }
 
@@ -300,3 +337,4 @@ exports.apiHandlerForFeeInquiry = apiHandlerForFeeInquiry;
 exports.apiHandlerForAgentLocatorGetCity = apiHandlerForAgentLocatorGetCity;
 exports.apiDefaultWelcomeIntent = apiDefaultWelcomeIntent;
 exports.apiHandlerForAgentLocator = apiHandlerForAgentLocator;
+exports.apiDefaultWelcomeIntentGetUsername = apiDefaultWelcomeIntentGetUsername;

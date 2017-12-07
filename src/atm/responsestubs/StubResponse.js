@@ -1,6 +1,6 @@
 
 //Welcome response stub
-var WelcomeStubResponse = {
+let WelcomeStubResponse = {
 	"speech": "Thank you for calling NCR corporation." +
     		  " My name is Vega. How can I help you today? You can say Report an ATM issue or Check status of an ATM incident",
 	"displayText": "Thank you for calling NCR corporation." +
@@ -9,7 +9,7 @@ var WelcomeStubResponse = {
 }
 
 //ReportAtmIncident
-var ReportAtmIncident = {
+let ReportAtmIncident = {
 	"speech": "Regret the inconvenience, can you please assist me with the ATM ID?",
 	"displayText": "Regret the inconvenience, can you please assist me with the ATM ID?",
 	"source": "Opus-NLP"
@@ -18,10 +18,10 @@ var ReportAtmIncident = {
 //ReportAtmIncident_get_atmid
 function ReportAtmIncidentGetAtmId(req){
 	//random selection of response
-	var reportAtmIncidentGetAtmIdSet = ["Sorry for the inconvenience. I will raise a incident ticket. Kindly tell me your name",
+	let reportAtmIncidentGetAtmIdSet = ["Sorry for the inconvenience. I will raise a incident ticket. Kindly tell me your name",
 								 		"I have just checked the working status of ATM"+req.body.result.parameters.atmId.atmId+ 
 								 		"is working properly. Is there anything I can help you with?"];
-	var reportAtmIncidentGetAtmId = reportAtmIncidentGetAtmIdSet[Math.floor(Math.random()*reportAtmIncidentGetAtmIdSet.length)];
+	let reportAtmIncidentGetAtmId = reportAtmIncidentGetAtmIdSet[Math.floor(Math.random()*reportAtmIncidentGetAtmIdSet.length)];
 
 	return {
 		"speech": reportAtmIncidentGetAtmId,
@@ -71,31 +71,38 @@ function ReportAtmIncidentGetIssue(req,incid,technician){
 }
 
 //track-atm-incident
-var TrackAtmIncident = {
+let TrackAtmIncident = {
 	"speech": "Sure, I can help you with incident status. Can you please assist me with the incident number",
 	"displayText": "Sure, I can help you with incident status. Can you please assist me with the incident number",
 	"source": "Opus-NLP"
 } 
 
 function TrackAtmIncidentGetIncId(ROWS){
-	console.log("Inside tedtdtub---->"+ROWS);
-	var resTime = Math.floor(Math.random()*(10));
-	return{
-	"speech": "Thank you for your patience. Our systems indicate that the ATM"
+	console.log("Inside tedtdtub---->",ROWS);
+	let resTime = Math.floor(Math.random()*(10));
+	let response = {
+		"speech": "Thank you for your patience. Our systems indicate that the ATM"
 			  +ROWS[0].atmid+" is reported "+ROWS[0].issue+" on "+ROWS[0].inctime+
 			  ". The last action or update is '"+ROWS[0].status+
 			  "'. We will try our best to have this resolved in next "+resTime+" hours. Is there anything else that I may assist you with?",
-	"displayText": "Thank you for your patience. Our systems indicate that the ATM"
+		"displayText": "Thank you for your patience. Our systems indicate that the ATM"
 			  +ROWS[0].atmid+" is reported "+ROWS[0].issue+" on "+ROWS[0].inctime+
 			  ". The last action or update is '"+ROWS[0].status+
 			  "'. We will try our best to have this resolved in next "+resTime+" hours. Is there anything else that I may assist you with?",
-	"source": "Opus-NLP"
+	  	"source": "Opus-NLP"	
 	}
+	return response;
 }
 
-var ReportAtmIncidentGetAtmIdLoop = {
+let ReportAtmIncidentGetAtmIdLoop = {
 	"speech": "Certainly, can you please provide me your Name so that I can raise an incident ticket.",
 	"displayText": "Certainly, can you please provide me your Name so that I can raise an incident ticket.",
+	"source": "Opus-NLP"
+}
+
+let CancelAllIntent = {
+	"speech": "Thank you for using our service.",
+	"displayText": "Thank you for using our service.",
 	"source": "Opus-NLP"
 }
 
@@ -109,3 +116,4 @@ exports.ReportAtmIncidentGetIssue = ReportAtmIncidentGetIssue;
 exports.TrackAtmIncident = TrackAtmIncident;
 exports.TrackAtmIncidentGetIncId = TrackAtmIncidentGetIncId;
 exports.ReportAtmIncidentGetAtmIdLoop = ReportAtmIncidentGetAtmIdLoop;
+exports.CancelAllIntent = CancelAllIntent;

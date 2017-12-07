@@ -1,7 +1,7 @@
-var requestConfig = {
+let requestConfig = {
 };
 
-var DaysOfWeek = {
+let DaysOfWeek = {
 
     "0" : "Sunday",
     "1" : "Monday",

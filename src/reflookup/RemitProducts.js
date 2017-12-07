@@ -1,7 +1,7 @@
-var requestConfig = {
+let requestConfig = {
 };
 
-var RemitProducts = {
+let RemitProducts = {
         ProductWithCCorCash : {
                 "DIRECT TO BANK" : "0-1 Business Days",
                 "INSTANT MONEY TRANSFER" : "In Minutes",

@@ -14,22 +14,22 @@
     //speech = let me confirm ur details => all entities with sentence formation . Do u want to continue.
 
 
-var BillInitResponse = {
-    "speech": "Hey there, what bill do you want me to pay ? I can pay for Gas Bill , Light Bill and Phone Bill .",
-	"displayText": "Hey there, what bill do you want me to pay ? I can pay for Gas Bill , Light Bill and Phone Bill .",
+let BillInitResponse = {
+    "speech": "Sure, I can help you with that. What type of bill would you like to pay. You can say Gas Bill, Power Bill or Phone Bill.",
+	"displayText": "Sure, I can help you with that. What type of bill would you like to pay. You can say Gas Bill, Power Bill or Phone Bill.",
 	"source": "Opus-NLP"
 }
-var GasBillInitResponse = {
+let GasBillInitResponse = {
     "speech": "",
 	"displayText": "",
 	"source": "Opus-NLP"
 }
-var LightBillInitResponse = {
+let LightBillInitResponse = {
     "speech": "",
 	"displayText": "",
 	"source": "Opus-NLP"
 }
-var PhoneBillInitResponse = {
+let PhoneBillInitResponse = {
     "speech": "",
 	"displayText": ".",
 	"source": "Opus-NLP"
@@ -38,18 +38,18 @@ var PhoneBillInitResponse = {
 
 
 function AddBillerResponse(req){
-	var BILLERNAME = req.body.result.parameters.Billers;
-    var AUTOPAYMODE = req.body.result.parameters.AutoPayMode;
-    var AUTOPAYREQUIRED = req.body.result.parameters.AutoPayRequired;
-    var CUSTID = req.body.result.parameters.CustId;
-    var USERNAME = req.body.result.parameters.UserName;
-	var SSN = req.body.result.parameters.SSN;
+	let BILLERNAME = req.body.result.parameters.Billers;
+    let AUTOPAYMODE = req.body.result.parameters.AutoPayMode;
+    let AUTOPAYREQUIRED = req.body.result.parameters.AutoPayRequired;
+    let CUSTID = req.body.result.parameters.CustId;
+    let USERNAME = req.body.result.parameters.UserName;
+	let SSN = req.body.result.parameters.SSN;
 	
-	var addBillerResponseStub = {
+	let addBillerResponseStub = {
 		"speech": `Let me confirm your details. Biller name: ${BILLERNAME} , Auto Pay Required: ${AUTOPAYREQUIRED},
-					Auto Pay Mode: ${AUTOPAYMODE} , Customer id: ${CUSTID} and SSN: ${SSN}. Do you confirm to add the biller?`,
+Auto Pay Mode: ${AUTOPAYMODE} , Customer id: ${CUSTID} and SSN: ${SSN}. Do you confirm to add the biller?`,
 		"displayText": `Let me confirm your details. Biller name: ${BILLERNAME} , Auto Pay Required: ${AUTOPAYREQUIRED},
-		Auto Pay Mode: ${AUTOPAYMODE} , Customer id: ${CUSTID} and SSN: ${SSN}. Do you confirm to add the biller?`,
+Auto Pay Mode: ${AUTOPAYMODE} , Customer id: ${CUSTID} and SSN: ${SSN}. Do you confirm to add the biller?`,
 		"source": "Opus-NLP"
 
 	}
@@ -58,9 +58,9 @@ function AddBillerResponse(req){
 
 
 function AddBillerYesResponse(req){
-	var BILLERNAME = req.body.result.parameters.Billers;
+	let BILLERNAME = req.body.result.parameters.Billers;
    
-	var addBillerYesResponseStub = {
+	let addBillerYesResponseStub = {
 		"speech":`You have successfully registered the biller: ${BILLERNAME}`,
 		"displayText": `You have successfully registered the biller: ${BILLERNAME}`,
 		"source": "Opus-NLP"
@@ -69,13 +69,13 @@ function AddBillerYesResponse(req){
 	return addBillerYesResponseStub;
 }
 
-var AddBillerNoResponse = {
+let AddBillerNoResponse = {
 	"speech":"The Biller registration has been cancelled. ",
 	"displayText": "The Biller registration has been cancelled.",
 	"source": "Opus-NLP"
 }
 
-var SelectBillerPayBillResponse = {
+let SelectBillerPayBillResponse = {
 	"speech": "",
 	"displayText": "",
 	"source": "Opus-NLP"
