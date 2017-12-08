@@ -39,6 +39,15 @@ async function insertSessionId(req){
 	return result;
 }
 
+async function getUsername(req){
+	let sessionId = req.body.sessionId;
+	let con = await createMysqlConnection();
+	let query = "SELECT username FROM CustomerAcct WHERE sessionid = '"+sessionId+"';";
+	let [result,fields] = await con.query(query);
+	return result[0].username;
+}
+
 exports.getContactOfUser = getContactOfUser;
 exports.checkIfSessionIdPresent = checkIfSessionIdPresent;
 exports.insertSessionId = insertSessionId;
+exports.getUsername = getUsername;

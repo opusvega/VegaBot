@@ -209,13 +209,123 @@ async function apiDefaultWelcomeIntent(req,res){
     let returnJsonObj = {
         "speech": "Welcome to Opus. My name is Vega. How can I help you?",
         "displayText": "Welcome to Opus. My name is Vega. How can I help you?",
-        "source": "Opus-NLP"
+        "messages": [
+            {
+                "type" : 0,
+                "platform" : "facebook",
+                "speech" : "Welcome to Opus. My name is Vega. How can I help you?"
+            },
+            {
+                "type" : 0,
+                "platform" : "facebook",
+                "speech" : "Choose any one of the following options!"
+            },
+            {
+                "type": 4,
+                "platform": "facebook",
+                "payload": {
+                  "facebook": {
+                    "attachment": {
+                        "payload": {
+                          "template_type": "list",
+                          "top_element_style" : "compact",
+                          "elements": [ 
+                            {
+                                "title" : "Fund Transfer",
+                                "buttons" : [
+                                    {
+                                        "title": "Proceed",
+                                        "type": "postback",
+                                        "payload": "Fund transfer"   
+                                    }
+                                ]
+                            },
+                            {
+                                "title" : "Pay Utility Bill",
+                                "buttons" : [
+                                    {
+                                        "title": "Proceed",
+                                        "type": "postback",
+                                        "payload": "Pay Bill"   
+                                    }
+                                ]  
+                            },
+                            {
+                                "title" : "Report ATM Issue",
+                                "buttons" : [
+                                    {
+                                        "title": "Proceed",
+                                        "type": "postback",
+                                        "payload": "Report atm issue"   
+                                    } 
+                                ] 
+                            },
+                            {
+                                "title" : "Track ATM Incident",
+                                "buttons" : [
+                                    {
+                                        "title": "Proceed",
+                                        "type": "postback",
+                                        "payload": "Track atm incident"   
+                                    }  
+                                ]
+                            }
+                          ]
+                        },
+                      "type": "template"
+                    }
+                  }
+                }
+              },
+              {
+                "type": 4,
+                "platform": "facebook",
+                "payload": {
+                  "facebook": {
+                    "attachment": {
+                        "payload": {
+                          "template_type": "list",
+                          "top_element_style" : "compact",
+                          "elements": [ 
+                            {
+                                "title" : "Estimate Fee For Rermittace",
+                                "buttons" : [
+                                    {
+                                        "title": "Proceed",
+                                        "type": "postback",
+                                        "payload": "Estimate fee"   
+                                    }
+                                ]
+                            },
+                            {
+                                "title" : "Find Remittance Agent",
+                                "buttons" : [
+                                    {
+                                        "title": "Proceed",
+                                        "type": "postback",
+                                        "payload": "find an agent"   
+                                    }
+                                ]  
+                            }
+                          ]
+                        },
+                      "type": "template"
+                    }
+                  }
+                }
+              }
+            ],
+        "source": "Opus-NLP",
     }
     JSON.stringify(returnJsonObj);
     console.log(returnJsonObj);
     let result = await mysqlFunctions.checkIfSessionIdPresent(req);
     if(result.length == 0){
-        returnJsonObj.speech = "Hi there! Please tell me your username to proceed further.";
+        returnJsonObj = {
+            "speech": "Hi there! Please tell me your username to proceed further.",
+            "displayText": "Welcome to Opus. My name is Vega. How can I help you?",
+            "source": "Opus-NLP"
+        }
         returnJsonObj.displayText = returnJsonObj.speech;
     }
     let speech = returnJsonObj.speech;
@@ -232,6 +342,112 @@ async function apiDefaultWelcomeIntentGetUsername(req,res){
     let returnJsonObj = {
         "speech": "Welcome to Opus. My name is Vega. How can I help you?",
         "displayText": "Welcome to Opus. My name is Vega. How can I help you?",
+        "messages": [
+            {
+                "type" : 0,
+                "platform" : "facebook",
+                "speech" : "Welcome to Opus. My name is Vega. How can I help you?"
+            },
+            {
+                "type" : 0,
+                "platform" : "facebook",
+                "speech" : "Choose any one of the following options!"
+            },
+            {
+                "type": 4,
+                "platform": "facebook",
+                "payload": {
+                  "facebook": {
+                    "attachment": {
+                        "payload": {
+                          "template_type": "list",
+                          "top_element_style" : "compact",
+                          "elements": [ 
+                            {
+                                "title" : "Fund Transfer",
+                                "buttons" : [
+                                    {
+                                        "title": "Proceed",
+                                        "type": "postback",
+                                        "payload": "Fund transfer"   
+                                    }
+                                ]
+                            },
+                            {
+                                "title" : "Pay Utility Bill",
+                                "buttons" : [
+                                    {
+                                        "title": "Proceed",
+                                        "type": "postback",
+                                        "payload": "Pay Bill"   
+                                    }
+                                ]  
+                            },
+                            {
+                                "title" : "Report ATM Issue",
+                                "buttons" : [
+                                    {
+                                        "title": "Proceed",
+                                        "type": "postback",
+                                        "payload": "Report atm issue"   
+                                    } 
+                                ] 
+                            },
+                            {
+                                "title" : "Track ATM Incident",
+                                "buttons" : [
+                                    {
+                                        "title": "Proceed",
+                                        "type": "postback",
+                                        "payload": "Track atm incident"   
+                                    }  
+                                ]
+                            }
+                          ]
+                        },
+                      "type": "template"
+                    }
+                  }
+                }
+              },
+              {
+                "type": 4,
+                "platform": "facebook",
+                "payload": {
+                  "facebook": {
+                    "attachment": {
+                        "payload": {
+                          "template_type": "list",
+                          "top_element_style" : "compact",
+                          "elements": [ 
+                            {
+                                "title" : "Estimate Fee For Rermittace",
+                                "buttons" : [
+                                    {
+                                        "title": "Proceed",
+                                        "type": "postback",
+                                        "payload": "Estimate fee"   
+                                    }
+                                ]
+                            },
+                            {
+                                "title" : "Find Remittance Agent",
+                                "buttons" : [
+                                    {
+                                        "title": "Proceed",
+                                        "type": "postback",
+                                        "payload": "find an agent"   
+                                    }
+                                ]  
+                            }
+                          ]
+                        },
+                      "type": "template"
+                    }
+                  }
+                }
+              }
+            ],
         "source": "Opus-NLP"
     }
     JSON.stringify(returnJsonObj);

@@ -3,7 +3,7 @@ console.log('Entering router.js...');
 let config = require('./config.js');
 let apiRemittanceFunctionController = require('./remit/api/controllers/remitApiHandler.js');
 let apiAtmFunctionController = require('./atm/api/controllers/atmApiHandler.js');
-let apiBankFunctionController = require('./bank/api/controllers/bankApiHandler.js');
+let apiBankFunctionController = require('./billpay/api/controllers/bankApiHandler.js');
 let apiFundFunctionController = require('./fund-transfer/api/controllers/fundApiHandler.js');
 let fs = require('fs');
 
@@ -20,7 +20,7 @@ let appRouter = function(app) {
     	 let RemitProducts = config.RemitProducts;
     	 res.send(RemitProducts);
     });
-    	
+
     app.get("/DaysOfWeek", function(req, res) {
     	 let DaysOfWeek = config.DaysOfWeek;
     	 res.send(DaysOfWeek);
@@ -31,12 +31,12 @@ let appRouter = function(app) {
     	 res.send(ErrorMessages);
     });
 
-    
+
 
     app.post('/hook', async function(req, res) {
         console.log("inside router app.post: ");
         console.log(req.body);
-        
+
         //All remittance cases
         if (req.body.result.metadata.intentName == "TrackTransfer") {
 
@@ -70,10 +70,7 @@ let appRouter = function(app) {
             await apiRemittanceFunctionController.apiDefaultWelcomeIntentGetUsername(req, res);
             console.log("Exiting router DefaultWelcomeIntent-get-username------>");
         }
-
-        
-
-        if(req.body.result.metadata.intentName == "FeeEstimate"){
+          if(req.body.result.metadata.intentName == "FeeEstimate"){
             console.log("Entering router FeeEstimate------>");
             await apiRemittanceFunctionController.apiHandlerForFeeEstimate(req, res);
             console.log("Exiting router FeeEstimate------>");
@@ -152,47 +149,87 @@ let appRouter = function(app) {
         }
 
         //Bill payment use cases
-        if(req.body.result.metadata.intentName == "bill-init-intent"){
-            console.log("Entering router bill-init-intent------>");
+        if(req.body.result.metadata.intentName == "pay-bill-init"){
+            console.log("Entering router pay-bill-init------>");
             await apiBankFunctionController.apiHandlerForBillInit(req, res);
-            console.log("Exiting router bill-init-intent------>");
+            console.log("Exiting router pay-bill-init------>");
         }
-        if(req.body.result.metadata.intentName == "gas-bill-init-pay"){
-            console.log("Entering router gas-bill-init-pay------>");
+        if(req.body.result.metadata.intentName == "pay-gas-bill-init"){
+            console.log("Entering router pay-gas-bill-init------>");
             await apiBankFunctionController.apiHandlerForGasBillInit(req, res);
-            console.log("Exiting router gas-bill-init-pay------>");
+            console.log("Exiting router pay-gas-bill-init------>");
         }
-        if(req.body.result.metadata.intentName == "light-bill-init-pay"){
-            console.log("Entering router light-bill-init-pay------>");
-            await apiBankFunctionController.apiHandlerForLightBillInit(req, res);
-            console.log("Exiting router light-bill-init-pay------>");
+        if(req.body.result.metadata.intentName == "pay-power-bill-init"){
+            console.log("Entering router pay-power-bill-init------>");
+            await apiBankFunctionController.apiHandlerForPowerBillInit(req, res);
+            console.log("Exiting router pay-power-bill-init------>");
         }
-        if(req.body.result.metadata.intentName == "phone-bill-init-pay"){
-            console.log("Entering router phone-bill-init-pay------>");
+        if(req.body.result.metadata.intentName == "pay-phone-bill-init"){
+            console.log("Entering router pay-phone-bill-init------>");
             await apiBankFunctionController.apiHandlerForPhoneBillInit(req, res);
-            console.log("Exiting router phone-bill-init-pay------>");
-        }
-        if(req.body.result.metadata.intentName == "add-biller"){
-            console.log("Entering router add-biller------>");
-            await apiBankFunctionController.apiHandlerForAddBiller(req, res);
-            console.log("Exiting router add-biller------>");
-        }
-        if(req.body.result.metadata.intentName == "add-biller-yes"){
-            console.log("Entering add-biller-yes------>");
-            await apiBankFunctionController.apiHandlerForAddBillerYes(req, res);
-            console.log("Exiting add-biller-yes------>");
-        }
-        if(req.body.result.metadata.intentName == "add-biller-no"){
-            console.log("Entering add-biller-no------>");
-            await apiBankFunctionController.apiHandlerForAddBillerNo(req, res);
-            console.log("Exiting add-biller-no------>");
+            console.log("Exiting router pay-phone-bill-init------>");
         }
         if(req.body.result.metadata.intentName == "select-biller-pay-bill"){
             console.log("Entering select-biller-pay-bill------>");
             await apiBankFunctionController.apiHandlerForSelectBillerPayBill(req, res);
             console.log("Exiting select-biller-pay-bill------>");
         }
-
+        if(req.body.result.metadata.intentName == "add-biller-gas-power"){
+            console.log("Entering add-biller-gas-power------>");
+            await apiBankFunctionController.apiHandlerForAddBillerGasPower(req, res);
+            console.log("Exiting add-biller-gas-power------>");
+        }
+        if(req.body.result.metadata.intentName == "add-biller-get-state"){
+            console.log("Entering add-biller-get-state------>");
+            await apiBankFunctionController.apiHandlerForAddBillerGetState(req, res);
+            console.log("Exiting add-biller-get-state------>");
+        }
+        if(req.body.result.metadata.intentName == "add-biller-get-biller"){
+            console.log("Entering add-biller-get-biller------>");
+            await apiBankFunctionController.apiHandlerForAddBillerGetBiller(req, res);
+            console.log("Exiting add-biller-get-biller------>");
+        }
+        if(req.body.result.metadata.intentName == "add-biller-gas-power-yes"){
+            console.log("Entering add-biller-gas-power-yes------>");
+            await apiBankFunctionController.apiHandlerForAddBillerGasPowerYes(req, res);
+            console.log("Exiting add-biller-gas-power-yes------>");
+        }
+        if(req.body.result.metadata.intentName == "add-biller-gas-power-no"){
+            console.log("Entering add-biller-gas-power-no------>");
+            await apiBankFunctionController.apiHandlerForAddBillerGasPowerNo(req, res);
+            console.log("Exiting add-biller-gas-power-no------>");
+        }
+        if(req.body.result.metadata.intentName == "add-phone-biller"){
+            console.log("Entering add-phone-biller------>");
+            await apiBankFunctionController.apiHandlerForAddPhoneBiller(req, res);
+            console.log("Exiting add-phone-biller------>");
+        }
+        if(req.body.result.metadata.intentName == "add-phone-biller-get-provider"){
+            console.log("Entering add-phone-biller-get-provider------>");
+            await apiBankFunctionController.apiHandlerForAddPhoneBillerGetProvider(req, res);
+            console.log("Exiting add-phone-biller-get-provider------>");
+        }
+        if(req.body.result.metadata.intentName == "add-phone-biller-get-biller"){
+            console.log("Entering add-phone-biller-get-biller------>");
+            await apiBankFunctionController.apiHandlerForAddPhoneBillerGetBiller(req, res);
+            console.log("Exiting add-phone-biller-get-biller------>");
+        }
+        if(req.body.result.metadata.intentName == "add-phone-biller-get-biller-yes"){
+            console.log("Entering add-phone-biller-get-biller-yes------>");
+            await apiBankFunctionController.apiHandlerForAddPhoneBillerGetBillerYes(req, res);
+            console.log("Exiting add-phone-biller-get-biller-yes------>");
+        }
+         if(req.body.result.metadata.intentName == "add-phone-biller-get-biller-no"){
+            console.log("Entering add-phone-biller-get-biller-no------>");
+            await apiBankFunctionController.apiHandlerForAddPhoneBillerGetBillerNo(req, res);
+            console.log("Exiting add-phone-biller-get-biller-no------>");
+        }
+        if(req.body.result.metadata.intentName == "select-biller-pay-bill"){
+            console.log("Entering select-biller-pay-bill------>");
+            await apiBankFunctionController.apiHandlerForSelectBillerPayBill(req, res);
+            console.log("Exiting select-biller-pay-bill------>");
+        }
+        select-biller-pay-bill
         //Fund transfer use cases
         if(req.body.result.metadata.intentName == "transfer-init"){
             console.log("Entering router transfer-init------>");
@@ -260,7 +297,7 @@ let appRouter = function(app) {
             await apiAtmFunctionController.apiHandlerForCancelAllIntent(req, res);
             console.log("Exiting cancel-all-intent------>");
         }
-    }); 
+    });
 
 }
 
