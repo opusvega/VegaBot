@@ -2,7 +2,7 @@
 
 console.log('Entering apiHandler...before require apihandler');
 
-let mysql = require('mysql');
+//let mysql = require('mysql');
 let express = require('express');
 let bodyParser = require('body-parser');
 let conversationHistory = require('../../../history/LogHandler.js');
@@ -42,55 +42,81 @@ function logConversationHistory(req, speech) {
             logResponse = "Your conversational history will be sent to your registered mobile number";
         console.log("Exiting logConversationHistory ---->" + req);
             return logResponse;
-    }
+}
 
 
 
 async function checkBillerExistSpeech(req,username){
+    let billertype = req.body.result.parameters.billertype;
     let speech= "";
     //check if biller exists
     let response ;
-    let rows = await MysqlFunctions.selectBillersToPay(req,username);
-    if(rows.length == 0){
-        //add new biller
-        response = {
-          "speech" : "You have no biller registered. To Proceed you need to add a biller.",
-          "displayText" : "You have no biller registered. To Proceed you need to add a biller.",
-          "source" : "Opus NLP"
-        }
-        
-        return response;
-    }
-    else{
-      let billertype = req.body.result.parameters.billertype;
-      //list
-      if(rows.length == 1){
-        response = await stubResponse.cardTemplateResponse;  
+    let billerExist = await MysqlFunctions.checkBillers(req,username);
+    if(billerExist.length == 0){
+      response = {
+        "speech" : "You have no biller registered. To Proceed you need to add a biller.",
+        "displayText" : "You have no biller registered. To Proceed you need to add a biller.",
+        "source" : "Opus NLP"
       }
-      else{
-        response = await stubResponse.listTemplateResponse;  
-      }
-      //push result row to elements
-      response.messages[0].speech = `I have found following billers for ${billertype}. Select your biller.`;
-      for(let i=0;i<4 && i<rows.length ;i++){
-        let elementsObj = {};
-        elementsObj.buttons = [];
-        let button = {
-            "title": "Proceed",
-            "type": "postback",
-            "payload": rows[i].custbillerid
-            }
-        elementsObj.title = rows[i].billername;
-        elementsObj.subtitle = `CID : ${rows[i].custbillerid}
-        Biller Type : ${rows[i].billertype}
-        Amount Due : ${rows[i].amtdue}`;
-        elementsObj.buttons.push(button);
-        response.messages[1].payload.facebook.attachment.payload.elements.push(elementsObj);
-        console.log(elementsObj);
-      }
-      console.log(response);
+      
       return response;
     }
+    let isBillerTypeExist = await MysqlFunctions.isBillerTypeExist(req,username);
+    console.log("isBillerTypeExist.length====>",isBillerTypeExist)
+    if (isBillerTypeExist.length !=0 )
+    {
+        let rows = await MysqlFunctions.selectBillersToPay(req,username);
+        if(rows.length == 0){
+            //add new biller
+            response = {
+              "speech" : "You have no bills pending.",
+              "displayText" : "You have no bills pending.",
+              "source" : "Opus NLP"
+            }
+            
+            return response;
+        }
+        else{
+          let billertype = req.body.result.parameters.billertype;
+          //list
+          if(rows.length == 1){
+            response = await stubResponse.cardTemplateResponse;  
+          }
+          else{
+            response = await stubResponse.listTemplateResponse;  
+          }
+          //push result row to elements
+          response.messages[0].speech = `I have found following billers for ${billertype} whose bills are pending. Select your biller.`;
+          for(let i=0;i<4 && i<rows.length ;i++){
+            let elementsObj = {};
+            elementsObj.buttons = [];
+            let button = {
+                "title": "Proceed",
+                "type": "postback",
+                "payload": rows[i].custbillerid
+                }
+            elementsObj.title = rows[i].billername;
+            elementsObj.subtitle = `CID : ${rows[i].custbillerid}
+            Biller Type : ${rows[i].billertype}
+            Amount Due : ${rows[i].amtdue}`;
+            elementsObj.buttons.push(button);
+            response.messages[1].payload.facebook.attachment.payload.elements.push(elementsObj);
+            console.log(elementsObj);
+          }
+          console.log(response);
+          return response;
+        }
+    }
+    else{
+      response = {
+              "speech" : "You have no "+billertype+" biller registered. Please add one to proceed.",
+              "displayText" : "You have no "+billertype+" biller registered. Please add one to proceed.",
+              "source" : "Opus NLP"
+            }
+            
+            return response;
+    }
+    
 }
 
 

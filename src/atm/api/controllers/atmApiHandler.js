@@ -2,7 +2,7 @@
 
 console.log('Entering apiHandler...before require apihandler');
 
-let mysql = require('mysql');
+let mysql = require('mysql2/promise');
 let express = require('express');
 let bodyParser = require('body-parser');
 let conversationHistory = require('../../../history/LogHandler.js');

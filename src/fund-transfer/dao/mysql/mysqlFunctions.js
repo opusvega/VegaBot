@@ -16,8 +16,8 @@ async function getContact(req){
 	let username = config.senderUsername;
 	let sessionId = req.body.sessionId;
 	let con = await createMysqlConnection();
-	let query = "SELECT contact FROM CustomerAcct WHERE sessionid = '"+sessionId+"';";
-	let [result,fields] = await con.query(query);
+	let query = `SELECT contact FROM CustomerAcct WHERE sessionid = ?;`;
+	let [result,fields] = await con.execute(query,[sessionId]);
 	console.log("getContact------------->");
 	console.log(result);
 	return result[0].contact;
@@ -26,8 +26,8 @@ async function getContact(req){
 async function getUsername(req){
 	let sessionId = req.body.sessionId;
 	let con = await createMysqlConnection();
-	let query = "SELECT username FROM CustomerAcct WHERE sessionid = '"+sessionId+"';";
-	let [result,fields] = await con.query(query);
+	let query = `SELECT username FROM CustomerAcct WHERE sessionid = ?;`;
+	let [result,fields] = await con.execute(query,[sessionId]);
 	return result[0].username;
 }
 
@@ -37,7 +37,7 @@ async function isCustomerPayeeListNull(req){
 	let sessionId = req.body.sessionId;
 	let senderUsername = await getUsername(req); //username should be unique
 
-	let query = 'SELECT * FROM Payee WHERE customername = "'+senderUsername+'";';
+	let query = `SELECT * FROM Payee WHERE customername = ?;`;
 	console.log(senderUsername);
 	console.log(query);
 	let botchatfilepath = config.botchatfilepath;
@@ -45,7 +45,7 @@ async function isCustomerPayeeListNull(req){
 	let con = await createMysqlConnection();
 	try{
 
-		let [result, fields] = await con.query(query);
+		let [result, fields] = await con.execute(query,[senderUsername]);
 		console.log(result);
 		if (result.length == 0){
 			return 0; // earlier was false
@@ -63,10 +63,10 @@ async function isGetPayeeExist(req){
 	let con = await createMysqlConnection();
 	let username = await getUsername(req);
 	let payee = req.body.result.parameters.payee;
-	let query = 'SELECT * FROM Payee WHERE nickname LIKE "%'+payee+'%" OR payeename LIKE "%'+payee+'%" AND customername = "'+username+'";';
+	let query = `SELECT * FROM Payee WHERE nickname LIKE "%'+payee+'%" OR payeename LIKE "%'+payee+'%" AND customername = ?;`;
 	console.log(query);
 	try{
-		let [result,fields] = await con.query(query);
+		let [result,fields] = await con.query(query, [username]);
 		return result;
 
 	} catch (err){
@@ -102,9 +102,9 @@ async function checkBalance(req){
 	let con = await createMysqlConnection();
 	let username = await getUsername(req);
 	console.log("checkBalance  username======>"+username);
-	let query = "SELECT * FROM CustomerAcct WHERE 	username = '"+username+"';";
+	let query = `SELECT * FROM CustomerAcct WHERE 	username = ?;`;
 	try{
-		let [balance,fields] = await con.query(query);
+		let [balance,fields] = await con.execute(query,[username]);
 		return balance[0].balance; 
 	}
 	catch (err){
@@ -115,9 +115,9 @@ async function checkBalance(req){
 async function updateOTPCode(otpCode,req){
 	let con = await createMysqlConnection();
 	let username = await getUsername(req);
-	let query = "UPDATE CustomerAcct SET otp = "+otpCode+" WHERE username = '"+username+"';";
+	let query = `UPDATE CustomerAcct SET otp = ? WHERE username = ?`;
 	console.log(query);
-	let result = await con.query(query);
+	let result = await con.execute(query,[otpCode,username]);
 	console.log("updateOTPCode-------------->");
 	console.log(result);
 	console.log(result.affectedRows);
@@ -127,8 +127,8 @@ async function updateOTPCode(otpCode,req){
 async function isOTPValid(otpCode,req){
 	let con = await createMysqlConnection();
 	let username = await getUsername(req);
-	let query = "SELECT otp FROM CustomerAcct WHERE 	username = '"+username+"';";
-	let [result,fields] = await con.query(query);
+	let query = `SELECT otp FROM CustomerAcct WHERE username = ?;`;
+	let [result,fields] = await con.execute(query,[username]);
 	console.log("isOTPValid=========>",result[0].otp);
 	if(otpCode == result[0].otp){
 		return true;
@@ -142,17 +142,17 @@ async function updateBalance(req){
 	let amount = req.body.result.parameters.amount.currency.amount;
 	let username = await getUsername(req);
 	let con =await createMysqlConnection();
-	let query = "UPDATE CustomerAcct SET balance = balance - "+amount+" WHERE username = '"+username+"';";
-	let result = await con.query(query);
+	let query = `UPDATE CustomerAcct SET balance = balance - ? WHERE username = ?;`;
+	let result = await con.query(query,[amount,username]);
 	console.log(result.affectedRows);
 }
 
 async function getTransferDetails(req){
 	let uid = req.body.result.parameters.uid;
 	let con = await createMysqlConnection();
-	let newUid = uid.substr(-7);
-	let query = "SELECT * FROM Payee WHERE uid = "+parseInt(newUid)+";";
-	let [result, fields] = await con.query(query);
+	let newUid = parseInt(uid.substr(-7));
+	let query = `SELECT * FROM Payee WHERE uid = ?;`;
+	let [result, fields] = await con.query(query,[newUid]);
 	return result[0];
 
 }
