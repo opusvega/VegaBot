@@ -86,10 +86,10 @@ async function insertNewBiller(req,username){
 
 async function getDetailsOfCustomer(req){
   let cid = req.body.result.parameters.cid;
-  let query = "SELECT * FROM CustomerBiller WHERE custbillerid = "+cid+";";
+  let query = `SELECT * FROM CustomerBiller WHERE custbillerid = ?;`;
   console.log("getDetailsOfCustomer========>",query);
   let con = await createMysqlConnection();
-  let [result,fields] = await con.query(query);
+  let [result,fields] = await con.query(query,cid);
   console.log(result);
   return result[0];
 }
