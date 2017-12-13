@@ -229,7 +229,7 @@ let appRouter = function(app) {
             await apiBankFunctionController.apiHandlerForSelectBillerPayBill(req, res);
             console.log("Exiting select-biller-pay-bill------>");
         }
-        select-biller-pay-bill
+        // select-biller-pay-bill
         //Fund transfer use cases
         if(req.body.result.metadata.intentName == "transfer-init"){
             console.log("Entering router transfer-init------>");

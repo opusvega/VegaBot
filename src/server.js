@@ -5,7 +5,6 @@ let https = require('https');
 let http = require('http');
 let fs = require('fs');
 
-
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 

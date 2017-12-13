@@ -174,7 +174,8 @@ function AddPhoneBillerGetBiller(req){
       AutoPayrequired : ${autopayrequired}
       AutoPayMode : ${autopaymode}
       Limit Amount : ${limitamount}
-      CID : ${cid}`,
+      BID : ${cid}
+      Do you want to add this biller?`,
       "source": "Opus-NLP"
     }
     console.log("response ------------>",response.speech);

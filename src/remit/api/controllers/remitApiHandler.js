@@ -205,7 +205,6 @@ function apiHandlerForFeeInquiry(req, res) {
 //Welcome Intent
 async function apiDefaultWelcomeIntent(req,res){
     console.log("Entering apiDefaultWelcomeIntent ------>")
-    //let returnJsonObj = stubResponse.WelcomeStubResponse;
     let returnJsonObj = {
         "speech": "Welcome to Opus. My name is Vega. How can I help you?",
         "displayText": "Welcome to Opus. My name is Vega. How can I help you?",
@@ -276,47 +275,122 @@ async function apiDefaultWelcomeIntent(req,res){
                     }
                   }
                 }
-              },
-              {
-                "type": 4,
-                "platform": "facebook",
-                "payload": {
-                  "facebook": {
-                    "attachment": {
-                        "payload": {
-                          "template_type": "list",
-                          "top_element_style" : "compact",
-                          "elements": [ 
-                            {
-                                "title" : "Estimate Fee For Rermittace",
-                                "buttons" : [
-                                    {
-                                        "title": "Proceed",
-                                        "type": "postback",
-                                        "payload": "Estimate fee"   
-                                    }
-                                ]
-                            },
-                            {
-                                "title" : "Find Remittance Agent",
-                                "buttons" : [
-                                    {
-                                        "title": "Proceed",
-                                        "type": "postback",
-                                        "payload": "find an agent"   
-                                    }
-                                ]  
-                            }
-                          ]
-                        },
-                      "type": "template"
-                    }
-                  }
-                }
               }
             ],
         "source": "Opus-NLP",
     }
+    //let returnJsonObj = stubResponse.WelcomeStubResponse;
+    // let returnJsonObj = {
+    //     "speech": "Welcome to Opus. My name is Vega. How can I help you?",
+    //     "displayText": "Welcome to Opus. My name is Vega. How can I help you?",
+    //     "messages": [
+    //         {
+    //             "type" : 0,
+    //             "platform" : "facebook",
+    //             "speech" : "Welcome to Opus. My name is Vega. How can I help you?"
+    //         },
+    //         {
+    //             "type" : 0,
+    //             "platform" : "facebook",
+    //             "speech" : "Choose any one of the following options!"
+    //         },
+    //         {
+    //             "type": 4,
+    //             "platform": "facebook",
+    //             "payload": {
+    //               "facebook": {
+    //                 "attachment": {
+    //                     "payload": {
+    //                       "template_type": "list",
+    //                       "top_element_style" : "compact",
+    //                       "elements": [ 
+    //                         {
+    //                             "title" : "Fund Transfer",
+    //                             "buttons" : [
+    //                                 {
+    //                                     "title": "Proceed",
+    //                                     "type": "postback",
+    //                                     "payload": "Fund transfer"   
+    //                                 }
+    //                             ]
+    //                         },
+    //                         {
+    //                             "title" : "Pay Utility Bill",
+    //                             "buttons" : [
+    //                                 {
+    //                                     "title": "Proceed",
+    //                                     "type": "postback",
+    //                                     "payload": "Pay Bill"   
+    //                                 }
+    //                             ]  
+    //                         },
+    //                         {
+    //                             "title" : "Report ATM Issue",
+    //                             "buttons" : [
+    //                                 {
+    //                                     "title": "Proceed",
+    //                                     "type": "postback",
+    //                                     "payload": "Report atm issue"   
+    //                                 } 
+    //                             ] 
+    //                         },
+    //                         {
+    //                             "title" : "Track ATM Incident",
+    //                             "buttons" : [
+    //                                 {
+    //                                     "title": "Proceed",
+    //                                     "type": "postback",
+    //                                     "payload": "Track atm incident"   
+    //                                 }  
+    //                             ]
+    //                         }
+    //                       ]
+    //                     },
+    //                   "type": "template"
+    //                 }
+    //               }
+    //             }
+    //           },
+    //           {
+    //             "type": 4,
+    //             "platform": "facebook",
+    //             "payload": {
+    //               "facebook": {
+    //                 "attachment": {
+    //                     "payload": {
+    //                       "template_type": "list",
+    //                       "top_element_style" : "compact",
+    //                       "elements": [ 
+    //                         {
+    //                             "title" : "Estimate Fee For Rermittace",
+    //                             "buttons" : [
+    //                                 {
+    //                                     "title": "Proceed",
+    //                                     "type": "postback",
+    //                                     "payload": "Estimate fee"   
+    //                                 }
+    //                             ]
+    //                         },
+    //                         {
+    //                             "title" : "Find Remittance Agent",
+    //                             "buttons" : [
+    //                                 {
+    //                                     "title": "Proceed",
+    //                                     "type": "postback",
+    //                                     "payload": "find an agent"   
+    //                                 }
+    //                             ]  
+    //                         }
+    //                       ]
+    //                     },
+    //                   "type": "template"
+    //                 }
+    //               }
+    //             }
+    //           }
+    //         ],
+    //     "source": "Opus-NLP",
+    // }
     JSON.stringify(returnJsonObj);
     console.log(returnJsonObj);
     let result = await mysqlFunctions.checkIfSessionIdPresent(req);
@@ -338,8 +412,16 @@ async function apiDefaultWelcomeIntent(req,res){
 async function apiDefaultWelcomeIntentGetUsername(req,res){
     console.log("Entering apiDefaultWelcomeIntentGetUsername ------>")
     let result = await mysqlFunctions.insertSessionId(req);
-    //let returnJsonObj = stubResponse.WelcomeStubResponseGetUsername;
-    let returnJsonObj = {
+    let returnJsonObj;
+    if(result[0].affectedRows == 0){
+        returnJsonObj = {
+            "speech" : "It seems you have entered worng username. Please try again.",
+            "displayText" : "It seems you have entered worng username. Please try again.",
+            "source" : "Opus-NLP"
+        }
+    }
+    else{
+        returnJsonObj = {
         "speech": "Welcome to Opus. My name is Vega. How can I help you?",
         "displayText": "Welcome to Opus. My name is Vega. How can I help you?",
         "messages": [
@@ -409,53 +491,127 @@ async function apiDefaultWelcomeIntentGetUsername(req,res){
                     }
                   }
                 }
-              },
-              {
-                "type": 4,
-                "platform": "facebook",
-                "payload": {
-                  "facebook": {
-                    "attachment": {
-                        "payload": {
-                          "template_type": "list",
-                          "top_element_style" : "compact",
-                          "elements": [ 
-                            {
-                                "title" : "Estimate Fee For Rermittace",
-                                "buttons" : [
-                                    {
-                                        "title": "Proceed",
-                                        "type": "postback",
-                                        "payload": "Estimate fee"   
-                                    }
-                                ]
-                            },
-                            {
-                                "title" : "Find Remittance Agent",
-                                "buttons" : [
-                                    {
-                                        "title": "Proceed",
-                                        "type": "postback",
-                                        "payload": "find an agent"   
-                                    }
-                                ]  
-                            }
-                          ]
-                        },
-                      "type": "template"
-                    }
-                  }
-                }
               }
             ],
-        "source": "Opus-NLP"
+        "source": "Opus-NLP",
     }
+    //let returnJsonObj = stubResponse.WelcomeStubResponseGetUsername;
+    // let returnJsonObj = {
+    //     "speech": "Welcome to Opus. My name is Vega. How can I help you?",
+    //     "displayText": "Welcome to Opus. My name is Vega. How can I help you?",
+    //     "messages": [
+    //         {
+    //             "type" : 0,
+    //             "platform" : "facebook",
+    //             "speech" : "Welcome to Opus. My name is Vega. How can I help you?"
+    //         },
+    //         {
+    //             "type" : 0,
+    //             "platform" : "facebook",
+    //             "speech" : "Choose any one of the following options!"
+    //         },
+    //         {
+    //             "type": 4,
+    //             "platform": "facebook",
+    //             "payload": {
+    //               "facebook": {
+    //                 "attachment": {
+    //                     "payload": {
+    //                       "template_type": "list",
+    //                       "top_element_style" : "compact",
+    //                       "elements": [ 
+    //                         {
+    //                             "title" : "Fund Transfer",
+    //                             "buttons" : [
+    //                                 {
+    //                                     "title": "Proceed",
+    //                                     "type": "postback",
+    //                                     "payload": "Fund transfer"   
+    //                                 }
+    //                             ]
+    //                         },
+    //                         {
+    //                             "title" : "Pay Utility Bill",
+    //                             "buttons" : [
+    //                                 {
+    //                                     "title": "Proceed",
+    //                                     "type": "postback",
+    //                                     "payload": "Pay Bill"   
+    //                                 }
+    //                             ]  
+    //                         },
+    //                         {
+    //                             "title" : "Report ATM Issue",
+    //                             "buttons" : [
+    //                                 {
+    //                                     "title": "Proceed",
+    //                                     "type": "postback",
+    //                                     "payload": "Report atm issue"   
+    //                                 } 
+    //                             ] 
+    //                         },
+    //                         {
+    //                             "title" : "Track ATM Incident",
+    //                             "buttons" : [
+    //                                 {
+    //                                     "title": "Proceed",
+    //                                     "type": "postback",
+    //                                     "payload": "Track atm incident"   
+    //                                 }  
+    //                             ]
+    //                         }
+    //                       ]
+    //                     },
+    //                   "type": "template"
+    //                 }
+    //               }
+    //             }
+    //           },
+    //           {
+    //             "type": 4,
+    //             "platform": "facebook",
+    //             "payload": {
+    //               "facebook": {
+    //                 "attachment": {
+    //                     "payload": {
+    //                       "template_type": "list",
+    //                       "top_element_style" : "compact",
+    //                       "elements": [ 
+    //                         {
+    //                             "title" : "Estimate Fee For Rermittace",
+    //                             "buttons" : [
+    //                                 {
+    //                                     "title": "Proceed",
+    //                                     "type": "postback",
+    //                                     "payload": "Estimate fee"   
+    //                                 }
+    //                             ]
+    //                         },
+    //                         {
+    //                             "title" : "Find Remittance Agent",
+    //                             "buttons" : [
+    //                                 {
+    //                                     "title": "Proceed",
+    //                                     "type": "postback",
+    //                                     "payload": "find an agent"   
+    //                                 }
+    //                             ]  
+    //                         }
+    //                       ]
+    //                     },
+    //                   "type": "template"
+    //                 }
+    //               }
+    //             }
+    //           }
+    //         ],
+    //     "source": "Opus-NLP"
+    // }
+    }
+    
     JSON.stringify(returnJsonObj);
     console.log(returnJsonObj);
-    if(result[0].affectedRows == 0){
-        returnJsonObj.speech = "It seems you have entered worng username. Please try again.";
-        returnJsonObj.displayText = returnJsonObj.speech;
-    }
+    
     let speech = returnJsonObj.speech;
     console.log("Exiting apiDefaultWelcomeIntentGetUsername ------>")
     console.log(returnJsonObj);

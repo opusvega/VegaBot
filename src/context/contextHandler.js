@@ -1,16 +1,16 @@
 let mysql = require("mysql2/promise");
 let config = require("../config.js");
 let intentNameLookup = require("../reflookup/IntentNames.js");
+let callmysqlpool = require("../mysql-functions/createMysqlSingleton.js");
 
-
-function createMysqlConnection(){
-  let con = mysql.createConnection({
-      host: config.mysqlUrl,
-      user: config.mysqlUser,
-      password : config.mysqlPassword,
-      database: config.mysqldb
-    });
-  return con;
+async function getConnectionPool() {
+  try {
+    return (await callmysqlpool.getPool());
+  }
+  catch (err) {
+    console.log("Error in creating Mysql Pool");
+    return false;
+  }
 }
 
 //inserting new context entry with startintent name and session id
@@ -19,7 +19,8 @@ async function insertContextLog(req,endintentname){
     let SESSIONID = req.body.sessionId;
     let INTENTNAME = req.body.result.metadata.intentName;
    try{
-        let con  = await createMysqlConnection();
+        let pool = await getConnectionPool();
+        let con = await pool.getConnection();
         let sqlSelect = `SELECT * FROM contextlog WHERE intentname = ? AND sessionid = ? AND intentcomplete = FALSE;`;
         let [rows, fields] = await con.query(sqlSelect,[INTENTNAME,SESSIONID]);
         if(rows.length == 0){
@@ -42,7 +43,8 @@ async function updateContextLogIntentComplete(req){
     let SESSIONID = req.body.sessionId;
     let INTENTNAME = req.body.result.metadata.intentName;
     try{
-        let con = await createMysqlConnection();
+        let pool = await getConnectionPool();
+        let con = await pool.getConnection();
         let sql = `UPDATE contextlog SET intentcomplete = TRUE WHERE sessionid = ? AND endintentname = ? AND intentcomplete = FALSE;`;
         let result = await con.execute(sql,[SESSIONID,INTENTNAME]);
         console.log(result.affectedRows+" record(s) updated!");
@@ -56,7 +58,8 @@ async function updateContextLogIntentComplete(req){
 //updating lastintent name of present context entry
 async function updateContextLogEndIntent(req){
     let SESSIONID = req.body.sessionId;
-    let con = await createMysqlConnection();
+    let pool = await getConnectionPool();
+    let con = await pool.getConnection();
     let sql = `UPDATE contextlog SET intentcomplete = TRUE WHERE sessionid = ? AND intentcomplete = FALSE;`;
     let result = await con.execute(sql,[SESSIONID]);
     console.log(result.affectedRows+" record(s) updated!");
@@ -66,7 +69,8 @@ async function updateContextLogEndIntent(req){
 async function selectContextLogFalseIntentComplete(req){
     let SESSIONID = req.body.sessionId;
     let query = `SELECT intentname FROM contextlog WHERE sessionid = ? AND sessionflag = TRUE AND intentvisit = TRUE AND intentcomplete = FALSE;`;
-    let con = await createMysqlConnection();
+    let pool = await getConnectionPool();
+    let con = await pool.getConnection();
     let [rows, fields] = await con.execute(query,[SESSIONID]);
     console.log("**************************");
     console.log(rows);

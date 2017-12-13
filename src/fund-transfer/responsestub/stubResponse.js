@@ -1,6 +1,6 @@
 //response of "transfer-init" intent
 //response for "transfer-init" intent
-let TransferInit = {
+const TransferInit = {
  	"speech": "Sure, I can help you with that. Whom would you like to transfer the funds to?",
 	"displayText": "Sure, I can help you with that. Whom would you like to transfer the funds to?",
 	"source": "Opus-NLP"
@@ -8,8 +8,8 @@ let TransferInit = {
 
 //response for "transfer-get-payee" intent
 function TransferGetPayee(req){
-	let payee = req.body.result.parameters.payee;
-	let response = {
+	const payee = req.body.result.parameters.payee;
+	const response = {
 		"speech": "",
 		"displayText": "",
 		"messages": [
@@ -36,7 +36,7 @@ function TransferGetPayee(req){
 
 //response for "transfer-get-uid" intent and "transfer-get-payee-amount" intent
 function TransferGetUid(payee){
-	let response = {
+	const response = {
 		"speech": `How much do you want to send to ${payee}?`,
 		"displayText": `How much do you want to send to ${payee}?`,
 		"source": `Opus-NLP`	
@@ -46,7 +46,7 @@ function TransferGetUid(payee){
 
 //response for "transfer-get-amount" intent and "transfer-get-payee-amount" intent
 function TransferGetAmount(contact){
-	let response = {
+	const response = {
 		"speech": `We have sent an OTP to your registered mobile ******${contact}. Enter it when you receive it`,
 		"displayText": `We have sent an OTP to your registered mobile number ******${contact}. Enter it when you receive it`,
 		"source": `Opus-NLP`	
@@ -56,9 +56,9 @@ function TransferGetAmount(contact){
 
 //response for "transfer-get-otp" intent
 function TransferGetOtp(req,payee){
-	let currency = req.body.result.parameters.amount.currency.currency;
-	let amount = req.body.result.parameters.amount.currency.amount;
-	let response = {
+	const currency = req.body.result.parameters.amount.currency.currency;
+	const amount = req.body.result.parameters.amount.currency.amount;
+	const response = {
 		"speech": `Thank You for the OTP.  Your funds amounting ${currency}${amount} have been transferred to ${payee}.`,
 		"displayText": `Thank You for the OTP.  Your funds amounting ${currency}${amount} have been transferred to ${payee}.`,
 		"source": `Opus-NLP`		
@@ -67,7 +67,7 @@ function TransferGetOtp(req,payee){
 }
 
 //resoponse for "add-payee-init" intent
-let AddPayeeInit = {
+const AddPayeeInit = {
 	"speech": `So tell me the payee name.`,
 	"displayText": `So tell me the payee name.`,
 	"source": `Opus-NLP`
@@ -75,8 +75,8 @@ let AddPayeeInit = {
 
 //response for "add-payee-get-payeename" intent
 function AddPayeeGetPayeename(req){
-	let payee = req.body.result.parameters.payee;
-	let response = {
+	const payee = req.body.result.parameters.payee;
+	const response = {
 		"speech": `So what nickname would you like to give ${payee}.`,
 		"displayText": `So what nickname would you like to give ${payee}.`,
 		"source": `Opus-NLP`		
@@ -86,8 +86,8 @@ function AddPayeeGetPayeename(req){
 
 //response for "add-payee-get-nickname" intent
 function AddPayeeGetNickname(req){
-	let payee = req.body.result.parameters.payee;
-	let response = {
+	const payee = req.body.result.parameters.payee;
+	const response = {
 		"speech": `Okay. Tell me ${payee}'s bank name.`,
 		"displayText": `Okay. Tell me ${payee}'s bank name.`,
 		"source": `Opus-NLP`		
@@ -97,8 +97,8 @@ function AddPayeeGetNickname(req){
 
 //response for "add-payee-get-bankname" intent
 function AddPayeeGetBankname(req){
-	let payee = req.body.result.parameters.payee;
-	let response = {
+	const payee = req.body.result.parameters.payee;
+	const response = {
 		"speech": `Now, tell me ${payee}'s bank account number.`,
 		"displayText": `Now, tell me ${payee}'s bank account number.`,
 		"source": `Opus-NLP`		
@@ -108,8 +108,8 @@ function AddPayeeGetBankname(req){
 
 //response for "add-payee-get-accountnumber" intent
 function AddPayeeGetAccountnumber(req){
-	let payee = req.body.result.parameters.payee;
-	let response = {
+	const payee = req.body.result.parameters.payee;
+	const response = {
 		"speech": `And along with that I will be needing ${payee}'s bank routing number.`,
 		"displayText": `And along with that I will be needing ${payee}'s bank routing number.`,
 		"source": `Opus-NLP`		
@@ -119,9 +119,9 @@ function AddPayeeGetAccountnumber(req){
 
 //response for "add-payee-get-routingnumber" intent
 async function AddPayeeGetRoutingnumber(req){
-	let payee = req.body.result.parameters.payee;
+	const payee = req.body.result.parameters.payee;
 	//INSERT Query 
-	let response = {
+	const response = {
 		"speech": `${payee} has been added successfully in your account.`,
 		"displayText": `${payee} has been added successfully in your account.`,
 		"source": `Opus-NLP`		
@@ -129,7 +129,7 @@ async function AddPayeeGetRoutingnumber(req){
 	return response;
 }
 
-//exporting all functions and letants
+//exporting all functions and constants
 exports.TransferInit = TransferInit;
 exports.TransferGetPayee = TransferGetPayee;
 exports.TransferGetAmount = TransferGetAmount;

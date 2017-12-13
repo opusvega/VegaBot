@@ -1,23 +1,25 @@
 let mysql = require('mysql2/promise');
 let config = require("../../../config.js");
+let callmysqlpool = require("../../../mysql-functions/createMysqlSingleton.js");
 
-//mysql connection
-function createMysqlConnection(){
-    let con = mysql.createConnection({
-        host: config.mysqlUrl,
-        user: config.mysqlUser,
-        password: config.mysqlPassword,
-        database : config.mysqldb
-    });
-    return con;
+async function getConnectionPool() {
+  try {
+    return (await callmysqlpool.getPool());
+  }
+  catch (err) {
+    console.log("Error in creating Mysql Pool");
+    return false;
+  }
 }
 
 async function checkBillers(req,username){
 let query = `SELECT * FROM CustomerBiller WHERE username = ?`;
 try{
-  let con = await createMysqlConnection();
+  let pool = await getConnectionPool();
+  let con = await pool.getConnection();
   let [result, fields] = await con.execute(query,[username]);
   console.log(result);
+  con.release();
   return result;
 }
 catch (err){
@@ -32,9 +34,11 @@ async function isBillerTypeExist(req,username){
     let query = `SELECT * FROM CustomerBiller WHERE username = ? AND billertype = ?;`;
     console.log(query);
     try{
-        let con = await createMysqlConnection();
+        let pool = await getConnectionPool();
+        let con = await pool.getConnection();
         let [result, fields] = await con.execute(query,[username,billertype]);
         console.log(result);
+        con.release();
         return result;
     }
     catch (err){
@@ -49,9 +53,11 @@ async function selectBillersToPay(req,username){
     let query = `SELECT * FROM CustomerBiller WHERE username = ? AND billertype = ? AND amtdue != 0;`;
     console.log(query);
     try{
-        let con = await createMysqlConnection();
+        let pool = await getConnectionPool();
+        let con = await pool.getConnection();
         let [result, fields] = await con.execute(query,[username,billertype]);
         console.log(result);
+        con.release();
         return result;
     }
     catch (err){
@@ -66,8 +72,10 @@ async function getBillers(req){
   let query = `SELECT * FROM UtilityProviders WHERE statename = ? AND billertype = ? LIMIT 4;`;
   console.log("getBillers============>",query);
   try{
-      let con = await createMysqlConnection();
+      let pool = await getConnectionPool();
+      let con = await pool.getConnection();
       let [result, fields] = await con.execute(query,[state,billertype]);
+      con.release();
       console.log(result);
       return result;
   }
@@ -83,9 +91,11 @@ async function getPhoneBillers(req){
   let query = `SELECT * FROM InternetProviders  WHERE billertype = ? LIMIT 4;`;
   console.log("getBillers============>",query);
   try{
-      let con = await createMysqlConnection();
+      let pool = await getConnectionPool();
+      let con = await pool.getConnection();
       let [result, fields] = await con.execute(query,[billertype]);
       console.log(result);
+      con.release();
       return result;
   }
   catch (err){
@@ -100,12 +110,15 @@ async function insertNewBiller(req,username){
   let billertype = req.body.result.parameters.billertype;
   try{
     let amtdue = Math.floor(Math.random() * 100) + 5 ;
-    let con = await createMysqlConnection();
+    let pool = await getConnectionPool();
+    let con = await pool.getConnection();
     let query = "INSERT INTO CustomerBiller VALUES ("+
                 cid+",'"+username+"','"+billername+"','"+billertype+"',"+amtdue+",NOW());";
     console.log(query);
     //console.log(result);
     let result = await con.query(query);
+    await con.query("commit;");
+    con.release();
     return result.affectedRows;  
   }
   catch(err){
@@ -118,35 +131,51 @@ async function getDetailsOfCustomer(req){
   let cid = req.body.result.parameters.cid;
   let query = `SELECT * FROM CustomerBiller WHERE custbillerid = ?;`;
   console.log("getDetailsOfCustomer========>",query);
-  let con = await createMysqlConnection();
-  let [result,fields] = await con.execute(query,[cid]);
-  console.log(result);
-  return result[0];
+  try{
+      let pool = await getConnectionPool();
+      let con = await pool.getConnection();
+      let [result,fields] = await con.execute(query,[cid]);
+      console.log(result);
+      con.release();
+      return result[0];
+  } catch (err){
+    console.log("Error ===========>getDetailsOfCustomer",err);
+      return false;
+  }
+  
 }
 
 async function getBalanceOfCustomer(username){
   let query = `SELECT * FROM CustomerAcct WHERE username = ?;`;
   console.log("getDetailsOfCustomer========>",query);
-  let con = await createMysqlConnection();
+  let pool = await getConnectionPool();
+  let con = await pool.getConnection();
   let [result,fields] = await con.execute(query,[username]);
   console.log(result);
+  con.release();
   return result[0].balance;
 }
 
 async function updateCustomerBalance(amount, username){
   let query = `UPDATE CustomerAcct SET balance = balance - ? WHERE username = ?;`;
   console.log("getDetailsOfCustomer========>",query);
-  let con = await createMysqlConnection();
+  let pool = await getConnectionPool();
+  let con = await pool.getConnection();
   let result = await con.execute(query,[amount,username]);
   console.log(result);
+  await con.query("commit;");
+  con.release();
 }
 
 async function updateAmountDue(req){
   let cid = req.body.result.parameters.cid;
   let query = `UPDATE CustomerBiller SET amtdue = 0 WHERE custbillerid = ?;`;
   console.log("getDetailsOfCustomer========>",query);
-  let con = await createMysqlConnection();
+  let pool = await getConnectionPool();
+  let con = await pool.getConnection();
   let result = await con.execute(query,[cid]);
+  await con.query("commit;");
+  con.release();
 }
 
 exports.updateAmountDue = updateAmountDue;

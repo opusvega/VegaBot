@@ -8,8 +8,7 @@ async function payeeList(result,returnJsonObj){
     let routingNumber = result[res].routingnumber;
     let uid = result[res].uid;
     fbElementsObj.title = payeeName;
-            fbElementsObj.subtitle = `Nickname : ${nickName}
-BankName : ${bankName}
+            fbElementsObj.subtitle = `BankName : ${bankName}
 AccountNumber : ${accountNumber}
 RoutingNumber : ${routingNumber}`;
     var button = {};

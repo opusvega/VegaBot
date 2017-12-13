@@ -56,6 +56,10 @@ async function apiHandlerForTransferInit(req,res){
 			returnJsonObj.speech = 'You have no payee registered in your account. Please add one for initiating the fund transfer';
 			returnJsonObj.displayText = returnJsonObj.speech;
 		}
+		// else{
+		// 	returnJsonObj.speech = 'Sure, I can help you with that. Whom would you like to transfer the funds to?';
+		// 	returnJsonObj.displayText = returnJsonObj.speech;
+		// }
 	}
 	
     let speech = returnJsonObj.speech;
@@ -72,12 +76,19 @@ async function apiHandlerForTransferGetPayee(req,res){
 	let returnJsonObj = await stubResponse.TransferGetPayee(req);
 	JSON.stringify(returnJsonObj);
 	let result = await mysqlFunctions.isGetPayeeExist(req);
-	if(result != false){
-		if(result.length == 0){
-			returnJsonObj.speech = returnJsonObj.displayText = `There is no ${payee} registered in your account.
-																Make sure you have entered correctly or go for adding new payee.` ;
+	console.log('apiHandlerForTransferGetPayee=====>result===>',result);
+	console.log('apiHandlerForTransferGetPayee====>returnJsonObj===>',returnJsonObj);
+	if(result != true){
+		if(result.length === 0){
+			returnJsonObj = {
+				"speech": `There is no ${payee} registered in your account. Make sure you have entered correctly or go for adding new payee.`,
+				"displayText": `There is no ${payee} registered in your account. Make sure you have entered correctly or go for adding new payee.`,
+				"source": "Opus-NLP"
+			}
+			// returnJsonObj.speech = `There is no ${payee} registered in your account.Make sure you have entered correctly or go for adding new payee.` ;
+			// returnJsonObj.displayText = returnJsonObj.speech;
 		}
-		if(result.length == 1){
+		if(result.length === 1){
 			returnJsonObj = await util.payeeList(result,returnJsonObj);
 			returnJsonObj.messages[0].payload.facebook.attachment.payload.template_type = "generic";
 			console.log("Length of payee list is equal to 1");
@@ -128,11 +139,13 @@ async function apiHandlerForTransferGetAmount(req,res){
 			returnJsonObj.displayText = returnJsonObj.speech;
 		}
 		else{
-			let contact = await mysqlFunctions.getContact(req);
-			let otpCode = await otp.sendOtp(contact);
+			let contactDetails = await mysqlFunctions.getContact(req);
+			let contact = contactDetails.contact;
+			let mailId = contactDetails.email;
+			let otpCode = await otp.sendOtp(contact,mailId);
 			await mysqlFunctions.updateOTPCode(otpCode,req);
 			let lastDigit = String(contact).substr(-4);
-			returnJsonObj.speech = `We have sent an OTP to your registered mobile ******${lastDigit}. Enter it when you receive it`;
+			returnJsonObj.speech = `We have sent an OTP to your registered email address. Enter it when you receive it`;
 			returnJsonObj.displayText = returnJsonObj.speech;
 		}
 	}

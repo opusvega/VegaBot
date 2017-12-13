@@ -1,16 +1,15 @@
-let mysql = require('mysql2/promise');
-let config = require("../../../config.js");
+let callmysqlpool = require("../../../mysql-functions/createMysqlSingleton.js");
 
-//creating mysql connection
-function createMysqlConnection(){
-    let con = mysql.createConnection({
-        host: config.mysqlUrl,
-        user: config.mysqlUser,
-        password: config.mysqlPassword,
-        database : config.mysqldb
-    });
-    return con;
+async function getConnectionPool() {
+  try {
+    return (await callmysqlpool.getPool());
+  }
+  catch (err) {
+    console.log("Error in creating Mysql Pool");
+    return false;
+  }
 }
+
 
 //fetching INCID which is just inserted depending on other parameters
 async function selectIncidentId(req){
@@ -19,8 +18,10 @@ async function selectIncidentId(req){
     let CONTACT = req.body.result.parameters.contact.contact;
     try{    
         let query = `SELECT incid FROM incidentlog WHERE atmid = ? AND username = ? AND usercontact = ?; `;
-        let con = await createMysqlConnection();
+        let pool = await getConnectionPool();
+        let con = await pool.getConnection();
         let [rows, fields] = await con.execute(query,[ATMID,USERNAME,CONTACT]);
+        con.release();
         console.log(rows);
         return rows[0].incid;
     }
@@ -35,9 +36,11 @@ async function selectIncidentStatus(req){
     //let query = "SELECT atmid, issue, DATE_FORMAT(inctime, '%a %d %b %Y %T' ) inctime, status FROM incidentlog WHERE incid = "+INCID;
     let query = `SELECT atmid, issue, DATE_FORMAT(inctime, '%a %d %b %Y %T' ) inctime, status FROM incidentlog WHERE incid = ?`;
     try{
-        let con = await createMysqlConnection();
+        let pool = await getConnectionPool();
+        let con = await pool.getConnection();
         let [rows, fields] = await con.execute(query,[INCID]);
         console.log(rows);
+        con.release();
         return rows;
     }
     catch (err){
@@ -53,10 +56,13 @@ async function insertIncidentLog(req, technicianName){
     let CONTACT = req.body.result.parameters.contact.contact;
     let TECHNICIAN = technicianName;
     try{
-        let con = await createMysqlConnection();
+        let pool = await getConnectionPool();
+        let con = await pool.getConnection();
         let sql = "INSERT INTO incidentlog (incid, atmid, issue, status,username, usercontact, inctime, restime,technician) VALUES"+
                           " (DEFAULT, "+ATMID+", '"+ISSUE+"','In-progress','"+CUSTOMERNAME+"','"+CONTACT+"',NOW(), NOW(), '"+TECHNICIAN+"');";
         let result = await con.query(sql);
+        await con.query("commit;");
+        con.release();
         console.log(`SUCCESSFULL insertIncidentLog`);
     }
     catch (err){
@@ -71,9 +77,11 @@ async function selectContextLogFalseIntentComplete(req,callback){
     let SESSIONID = req.body.sessionId;
     let query = `SELECT intentname FROM contextlog WHERE sessionid = ? AND sessionflag = TRUE AND intentvisit = TRUE AND intentcomplete = FALSE;`;
     try{
-        let con = await createMysqlConnection();
+        let pool = await getConnectionPool();
+        let con = await pool.getConnection();
         let rows = await con.execute(query,[SESSIONID]);
         console.log(rows);
+        con.release();
         return rows;
     }
     catch (err){

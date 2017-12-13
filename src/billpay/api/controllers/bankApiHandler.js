@@ -47,6 +47,7 @@ function logConversationHistory(req, speech) {
 
 
 async function checkBillerExistSpeech(req,username){
+  console.log("INSIDE checkBillerExistSpeech=========>");
     let billertype = req.body.result.parameters.billertype;
     let speech= "";
     //check if biller exists
@@ -81,9 +82,11 @@ async function checkBillerExistSpeech(req,username){
           //list
           if(rows.length == 1){
             response = await stubResponse.cardTemplateResponse;  
+            console.log("INSIDE cardTemplateResponse=======>",rows.length);
           }
           else{
             response = await stubResponse.listTemplateResponse;  
+            console.log("INSIDE listTemplateResponse=======>",rows.length);
           }
           //push result row to elements
           response.messages[0].speech = `I have found following billers for ${billertype} whose bills are pending. Select your biller.`;
@@ -247,7 +250,7 @@ async function apiHandlerForAddBillerGasPowerYes(req,res){
   let returnJsonObj = stubResponse.AddBillerGasPowerYes(req);
   JSON.stringify(returnJsonObj);
   let username = await globalMysqlFunctions.getUsername(req);
-  let result = await mysqlFunctions.insertNewBiller(req,username);
+  let result = await MysqlFunctions.insertNewBiller(req,username);
   if(result == false){
     returnJsonObj.speech = "This biller already exists.";
     returnJsonObj.displayText = returnJsonObj.speech;  
