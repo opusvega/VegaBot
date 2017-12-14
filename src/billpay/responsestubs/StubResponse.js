@@ -1,26 +1,26 @@
-let BillInitResponse = {
+const BillInitResponse = {
   "speech": "Sure, I can help you with that. What type of bill would you like to pay. You can say Gas Bill, Power Bill or Phone Bill.",
   "displayText": "Sure, I can help you with that. What type of bill would you like to pay. You can say Gas Bill, Power Bill or Phone Bill.",
   "source": "Opus-NLP"
 }
 
-let GasBillInitResponse = {
+const GasBillInitResponse = {
   "speech": "",
 	"displayText": "",
 	"source": "Opus-NLP"
 }
-let LightBillInitResponse = {
+const LightBillInitResponse = {
   "speech": "",
 	"displayText": "",
 	"source": "Opus-NLP"
 }
-let PhoneBillInitResponse = {
+const PhoneBillInitResponse = {
   "speech": "",
 	"displayText": ".",
 	"source": "Opus-NLP"
 }
 
-let cardTemplateResponse = {
+const cardTemplateResponse = {
   "speech": "Welcome to Opus. My name is Vega. How can I help you?",
   "displayText": "Welcome to Opus. My name is Vega. How can I help you?",
   "messages": [
@@ -50,7 +50,7 @@ let cardTemplateResponse = {
   "source": "Opus-NLP"
 }
 
-let listTemplateResponse = {
+const listTemplateResponse = {
     "speech": "Welcome to Opus. My name is Vega. How can I help you?",
     "displayText": "Welcome to Opus. My name is Vega. How can I help you?",
     "messages": [
@@ -80,7 +80,7 @@ let listTemplateResponse = {
     "source": "Opus-NLP"
 }
 
-let AddBillerGasPowerResponse = {
+const AddBillerGasPowerResponse = {
   "speech": "Tell me your state name.",
   "displayText": "Tell me your state name.",
   "source": "Opus-NLP"
@@ -89,7 +89,7 @@ let AddBillerGasPowerResponse = {
 function AddBillerGetStateResponse(req){
   let state = req.body.result.parameters.state;
   let billertype = req.body.result.parameters.billertype;
-  let response = {
+  const response = {
     "speech": `Here is the list of utility providers for  ${billertype} in ${state}`,
     "displayText": `Here is the list of utility providers for  ${billertype} in ${state}`,
     "source": "Opus-NLP"
@@ -99,26 +99,28 @@ function AddBillerGetStateResponse(req){
 
   function AddBillerGetBillerResponse(req) {
     let  state = req.body.result.parameters.state;
-    let billers = req.body.result.parameters.billers;
+    let billers = req.body.result.parameters.billername;
     let autopayrequired  = req.body.result.parameters.autopayrequired;
     let autopaymode = req.body.result.parameters.autopaymode;
     let limitamount = req.body.result.parameters.limitamount;
     let cid = req.body.result.parameters.cid;
-    let response = {
+    const response = {
       "speech": `Let me confirm your details.
       State : ${state}
       Biller : ${billers}
       AutoPayrequired : ${autopayrequired}
       AutoPayMode : ${autopaymode}
       Limit Amount : ${limitamount}
-      CID : ${cid}`,
+      CID : ${cid}.
+      Do you want to add this biller?`,
       "displayText": `Let me confirm your details.
       State : ${state}
       Biller : ${billers}
       AutoPayrequired : ${autopayrequired}
       AutoPayMode : ${autopaymode}
       Limit Amount : ${limitamount}
-      CID : ${cid}`,
+      CID : ${cid}.
+      Do you want to add this biller?`,
       "source": "Opus-NLP"
     }
     return response;
@@ -127,7 +129,7 @@ function AddBillerGetStateResponse(req){
 function AddBillerGasPowerYes(req) {
 
  let billername = req.body.result.parameters.billername;
-  let response = {
+  const response = {
      "speech": `You have successfully registered ${billername}`,
   "displayText": `You have successfully registered ${billername}`,
   "source": "Opus-NLP"
@@ -135,19 +137,19 @@ function AddBillerGasPowerYes(req) {
  return response;
 }
 
-let AddBillerGasPowerNo = {
+const AddBillerGasPowerNo = {
   "speech": "Biller registration has been cancelled.",
   "displayText": "Biller registration has been cancelled..",
   "source": "Opus-NLP"
 }
 
-let AddPhoneBiller = {
+const AddPhoneBiller = {
   "speech": "Specify your Provider type - Wireless / Broadband.",
   "displayText": "Specify your Provider type - Wireless / Broadband",
   "source": "Opus-NLP"
 }
 
-let AddPhoneBillerGetProvider = {
+const AddPhoneBillerGetProvider = {
   "speech": "",
   "displayText": "",
   "source": "Opus-NLP"
@@ -160,7 +162,7 @@ function AddPhoneBillerGetBiller(req){
     let limitamount = req.body.result.parameters.limitamount;
     let cid = req.body.result.parameters.cid;
     let phoneprovider = req.body.result.parameters.phoneprovider;
-    let response = {
+    const response = {
       "speech": `Let me confirm your details.
       Phoneprovider : ${phoneprovider}
       Biller : ${billers}
@@ -184,40 +186,40 @@ function AddPhoneBillerGetBiller(req){
 }
 function AddPhoneBillerGetBillerYes(req) {
   let billername = req.body.result.parameters.billername;
-  let response = {
+  const response = {
      "speech": `You have successfully registered ${billername}`,
-  "displayText": `You have successfully registered ${billername}`,
-  "source": "Opus-NLP"
+    "displayText": `You have successfully registered ${billername}`,
+    "source": "Opus-NLP"
   }
  return response;
 }
 
-let AddPhoneBillerGetBillerNo = {
+const AddPhoneBillerGetBillerNo = {
  "speech": "",
   "displayText": "",
   "source": "Opus-NLP"
 }
 
-let selectBillerPayBill = {
+const selectBillerPayBill = {
   "speech": "",
   "displayText": "",
   "source": "Opus-NLP"
 }
 
-exports.BillInitResponse = BillInitResponse;
-exports.GasBillInitResponse = GasBillInitResponse;
-exports.LightBillInitResponse = LightBillInitResponse;
-exports.PhoneBillInitResponse = PhoneBillInitResponse;
-exports.AddBillerGasPowerResponse = AddBillerGasPowerResponse;
-exports.AddBillerGetStateResponse = AddBillerGetStateResponse;
-exports.AddBillerGasPowerYes = AddBillerGasPowerYes;
-exports.AddBillerGasPowerNo = AddBillerGasPowerNo;
-exports.AddBillerGetBillerResponse = AddBillerGetBillerResponse;
-exports.listTemplateResponse = listTemplateResponse;
-exports.cardTemplateResponse = cardTemplateResponse;
-exports.AddPhoneBillerGetProvider = AddPhoneBillerGetProvider;
-exports.AddPhoneBiller = AddPhoneBiller;
-exports.AddPhoneBillerGetBiller= AddPhoneBillerGetBiller;
-exports.AddPhoneBillerGetBillerYes = AddPhoneBillerGetBillerYes;
-exports.AddPhoneBillerGetBillerNo = AddPhoneBillerGetBillerNo;
-exports.selectBillerPayBill = selectBillerPayBill;
+module.exports.BillInitResponse = BillInitResponse;
+module.exports.GasBillInitResponse = GasBillInitResponse;
+module.exports.LightBillInitResponse = LightBillInitResponse;
+module.exports.PhoneBillInitResponse = PhoneBillInitResponse;
+module.exports.AddBillerGasPowerResponse = AddBillerGasPowerResponse;
+module.exports.AddBillerGetStateResponse = AddBillerGetStateResponse;
+module.exports.AddBillerGasPowerYes = AddBillerGasPowerYes;
+module.exports.AddBillerGasPowerNo = AddBillerGasPowerNo;
+module.exports.AddBillerGetBillerResponse = AddBillerGetBillerResponse;
+module.exports.listTemplateResponse = listTemplateResponse;
+module.exports.cardTemplateResponse = cardTemplateResponse;
+module.exports.AddPhoneBillerGetProvider = AddPhoneBillerGetProvider;
+module.exports.AddPhoneBiller = AddPhoneBiller;
+module.exports.AddPhoneBillerGetBiller= AddPhoneBillerGetBiller;
+module.exports.AddPhoneBillerGetBillerYes = AddPhoneBillerGetBillerYes;
+module.exports.AddPhoneBillerGetBillerNo = AddPhoneBillerGetBillerNo;
+module.exports.selectBillerPayBill = selectBillerPayBill;

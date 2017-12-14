@@ -1,4 +1,5 @@
 async function payeeList(result,returnJsonObj){
+    returnJsonObj.messages[0].payload.facebook.attachment.payload.elements = [];
   for (var res in result){
     var fbElementsObj = {};
     let payeeName = result[res].payeename;

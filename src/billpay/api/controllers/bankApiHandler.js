@@ -86,9 +86,11 @@ async function checkBillerExistSpeech(req,username){
           }
           else{
             response = await stubResponse.listTemplateResponse;  
+
             console.log("INSIDE listTemplateResponse=======>",rows.length);
           }
           //push result row to elements
+          response.messages[1].payload.facebook.attachment.payload.elements = [];
           response.messages[0].speech = `I have found following billers for ${billertype} whose bills are pending. Select your biller.`;
           for(let i=0;i<4 && i<rows.length ;i++){
             let elementsObj = {};
@@ -172,7 +174,7 @@ async function apiHandlerForPhoneBillInit(req,res){
     let username = await globalMysqlFunctions.getUsername(req);
     let response = await checkBillerExistSpeech(req,username);
     console.log("Exiting apiHandlerForPhoneBillInit ------>");
-    console.log(returnJsonObj);
+    console.log(response);
     let speech = response.speech;
     let mongoResponse = logConversationHistory(req, speech);
     context.insertContextLog(req,"select-biller-pay-bill");
@@ -217,8 +219,9 @@ async function apiHandlerForAddBillerGetState(req,res){
     if(result.length > 1){
       response = stubResponse.listTemplateResponse;
       //push result row to elements
+      response.messages[1].payload.facebook.attachment.payload.elements = [];
       response.messages[0].speech = `I have found following billers for ${billertype} in ${state}. Select your biller.`;
-      for(let i=0;i<4;i++){
+      for(let i=0;i<4 && i< result.length;i++){
         let elementsObj = {};
         elementsObj.buttons = [];
         let button = {
@@ -259,6 +262,16 @@ async function apiHandlerForAddBillerGasPowerYes(req,res){
   let speech = returnJsonObj.speech;
   console.log("Exiting apiHandlerForAddBillerGasPowerYes ------>")
   let mongoResponse = logConversationHistory(req, speech);
+  let resultContext = await context.selectContextLogFalseIntentComplete(req);
+        console.log("#################");
+        console.log(resultContext);
+        console.log("#################");
+        if(resultContext.length==1 ){
+            returnJsonObj = await context.cardCreate(returnJsonObj,resultContext);
+        }
+        if(resultContext.length > 1){
+            returnJsonObj = await context.listCreate(returnJsonObj,resultContext);   
+        }
   return res.json(returnJsonObj);
 }
 
@@ -270,6 +283,16 @@ async function apiHandlerForAddBillerGasPowerNo(req,res){
   let speech = returnJsonObj.speech;
   console.log("Exiting apiHandlerForAddBillerGasPowerNo ------>")
   let mongoResponse = logConversationHistory(req, speech);
+  let resultContext = await context.selectContextLogFalseIntentComplete(req);
+        console.log("#################");
+        console.log(resultContext);
+        console.log("#################");
+        if(resultContext.length==1 ){
+            returnJsonObj = await context.cardCreate(returnJsonObj,resultContext);
+        }
+        if(resultContext.length > 1){
+            returnJsonObj = await context.listCreate(returnJsonObj,resultContext);   
+        }
   return res.json(returnJsonObj);
 }
 
@@ -292,14 +315,15 @@ async function apiHandlerForAddPhoneBillerGetProvider(req,res){
   let billertype = req.body.result.parameters.billertype;
   //show list of available billers
   let result = await MysqlFunctions.getPhoneBillers(req);
-  let response ;
+  var response ;
   response = await stubResponse.listTemplateResponse;
       //push result row to elements
+      response.messages[1].payload.facebook.attachment.payload.elements = [];
       response.messages[0].speech = `I have found following billers for ${billertype}. Select your biller.`;
       for(let i=0;i<4;i++){
         let elementsObj = {};
         elementsObj.buttons = [];
-        let button = {
+        var button = {
             "title": "Proceed",
             "type": "postback",
             "payload": result[i].billername
@@ -308,6 +332,7 @@ async function apiHandlerForAddPhoneBillerGetProvider(req,res){
         elementsObj.buttons.push(button);
         response.messages[1].payload.facebook.attachment.payload.elements.push(elementsObj);
         console.log(elementsObj);
+        console.log(response.messages[1].payload.facebook.attachment.payload.elements);
       }
   let speech = `I have found following billers for ${billertype}. Select your biller.`;
   console.log("Exiting apiHandlerForAddPhoneBillerGetProvider ------>")
@@ -378,6 +403,26 @@ async function apiHandlerForSelectBillerPayBill(req,res){
   let speech = returnJsonObj.speech;
   console.log("Exiting apiHandlerForAddPhoneBillerGetBillerNo ------>")
   let mongoResponse = logConversationHistory(req, speech);
+
+  let updateContextLogIntentCompleteValue = await context.updateContextLogIntentComplete(req);
+
+  if(updateContextLogIntentCompleteValue != false){
+      console.log("updateContextLogIntentComplete SUCCESSFULL");
+      let result = await context.selectContextLogFalseIntentComplete(req);
+      console.log("#################");
+      console.log(result);
+      console.log("#################");
+      if(result.length==1 ){
+          returnJsonObj = await context.cardCreate(returnJsonObj,result);
+      }
+      if(result.length > 1){
+          returnJsonObj = await context.listCreate(returnJsonObj,result);   
+      }
+
+  }
+  else{
+      console.log("updateContextLogIntentComplete ERROR....");
+    }
   return res.json(returnJsonObj);
 }
 

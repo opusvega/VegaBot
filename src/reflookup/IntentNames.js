@@ -5,10 +5,11 @@ let intentLookup = {
 	trackatmincident : "Track ATM incident",
 	transferinit : "Fund Transfer",
 	addbiller : "Add Biller",
-	billinitintent : "Bill pay",
-	gasbillinitpay : "Pay Gas Bill",
-	lightbillinitpay : "Pay Power Bill",
-	phonebillinitpay : "Pay Phone Bill"
+	paybillinit : "Bill pay",
+	paygasbillinit : "Pay Gas Bill",
+	paypowerbillinit : "Pay Power Bill",
+	payphonebillinit : "Pay Phone Bill",
+	addpayeeinit : "Add Payee"
 }
 
 exports.intentLookup = intentLookup;

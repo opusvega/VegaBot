@@ -54,6 +54,15 @@ function TransferGetAmount(contact){
 	return response;
 }
 
+function TransferGetPayeeAmount(){
+	const response = {
+		"speech": ``,
+		"displayText": ``,
+		"source": `Opus-NLP`	
+	}
+	return response;
+}
+
 //response for "transfer-get-otp" intent
 function TransferGetOtp(req,payee){
 	const currency = req.body.result.parameters.amount.currency.currency;
@@ -68,7 +77,7 @@ function TransferGetOtp(req,payee){
 
 //resoponse for "add-payee-init" intent
 const AddPayeeInit = {
-	"speech": `So tell me the payee name.`,
+	"speech": `So tell me the full name of payee/beneficiary.`,
 	"displayText": `So tell me the payee name.`,
 	"source": `Opus-NLP`
 }
@@ -141,3 +150,4 @@ exports.AddPayeeGetBankname = AddPayeeGetBankname;
 exports.AddPayeeGetAccountnumber = AddPayeeGetAccountnumber;
 exports.AddPayeeGetRoutingnumber = AddPayeeGetRoutingnumber;
 exports.TransferGetUid = TransferGetUid;
+exports.TransferGetPayeeAmount = TransferGetPayeeAmount;

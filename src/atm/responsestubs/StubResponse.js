@@ -107,13 +107,13 @@ let CancelAllIntent = {
 }
 
 //exporting all stubs 
-exports.WelcomeStubResponse = WelcomeStubResponse;
-exports.ReportAtmIncident = ReportAtmIncident;
-exports.ReportAtmIncidentGetAtmId = ReportAtmIncidentGetAtmId;
-exports.ReportAtmIncidentGetName = ReportAtmIncidentGetName;
-exports.ReportAtmIncidentGetContact = ReportAtmIncidentGetContact;
-exports.ReportAtmIncidentGetIssue = ReportAtmIncidentGetIssue;
-exports.TrackAtmIncident = TrackAtmIncident;
-exports.TrackAtmIncidentGetIncId = TrackAtmIncidentGetIncId;
-exports.ReportAtmIncidentGetAtmIdLoop = ReportAtmIncidentGetAtmIdLoop;
-exports.CancelAllIntent = CancelAllIntent;
+module.exports.WelcomeStubResponse = WelcomeStubResponse;
+module.exports.ReportAtmIncident = ReportAtmIncident;
+module.exports.ReportAtmIncidentGetAtmId = ReportAtmIncidentGetAtmId;
+module.exports.ReportAtmIncidentGetName = ReportAtmIncidentGetName;
+module.exports.ReportAtmIncidentGetContact = ReportAtmIncidentGetContact;
+module.exports.ReportAtmIncidentGetIssue = ReportAtmIncidentGetIssue;
+module.exports.TrackAtmIncident = TrackAtmIncident;
+module.exports.TrackAtmIncidentGetIncId = TrackAtmIncidentGetIncId;
+module.exports.ReportAtmIncidentGetAtmIdLoop = ReportAtmIncidentGetAtmIdLoop;
+module.exports.CancelAllIntent = CancelAllIntent;

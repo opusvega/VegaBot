@@ -56,10 +56,10 @@ async function apiHandlerForTransferInit(req,res){
 			returnJsonObj.speech = 'You have no payee registered in your account. Please add one for initiating the fund transfer';
 			returnJsonObj.displayText = returnJsonObj.speech;
 		}
-		// else{
-		// 	returnJsonObj.speech = 'Sure, I can help you with that. Whom would you like to transfer the funds to?';
-		// 	returnJsonObj.displayText = returnJsonObj.speech;
-		// }
+		else{
+			returnJsonObj.speech = 'Sure, I can help you with that. Whom would you like to transfer the funds to?';
+			returnJsonObj.displayText = returnJsonObj.speech;
+		}
 	}
 	
     let speech = returnJsonObj.speech;
@@ -81,8 +81,8 @@ async function apiHandlerForTransferGetPayee(req,res){
 	if(result != true){
 		if(result.length === 0){
 			returnJsonObj = {
-				"speech": `There is no ${payee} registered in your account. Make sure you have entered correctly or go for adding new payee.`,
-				"displayText": `There is no ${payee} registered in your account. Make sure you have entered correctly or go for adding new payee.`,
+				"speech": `There is no ${payee} registered in your account. Make sure you have entered correctly or you can add new payee/beneficiary by stating 'add payee'.`,
+				"displayText": `There is no ${payee} registered in your account. Make sure you have entered correctly or you can add new payee/beneficiary by stating 'add payee'.`,
 				"source": "Opus-NLP"
 			}
 			// returnJsonObj.speech = `There is no ${payee} registered in your account.Make sure you have entered correctly or go for adding new payee.` ;
@@ -205,13 +205,96 @@ async function apiHandlerForTransferGetOtp(req,res){
 //api handler for "transfer-get-payee-amount" intent
 async function apiHandlerForTransferGetPayeeAmount(req,res){
 	console.log("Entering apiHandlerForTransferGetPayeeAmount==========>");
-	let contact = await mysqlFunctions.getContact(req);
-	let lastDigit = String(contact).substr(-4);
-	let returnJsonObj = await stubResponse.TransferGetAmount(lastDigit);
+	let amount = req.body.result.parameters.amount.currency.amount;
+	let payee = req.body.result.parameters.payee;
+	let returnJsonObj = await stubResponse.TransferGetPayeeAmount();	
 	JSON.stringify(returnJsonObj);
+
+	let flag = await mysqlFunctions.isCustomerPayeeListNull(req); 
+	console.log("FLAG--------->",flag);
+	//ERROR HANDLING
+	if(flag === false){
+		returnJsonObj.speech = "We are facing some techinal issue. Please try again after some time.";
+		returnJsonObj.displayText = returnJsonObj.speech;
+	
+	}
+	else{
+		if (flag === 0){
+			returnJsonObj.speech = 'You have no payee registered in your account. Please add one for initiating the fund transfer';
+			returnJsonObj.displayText = returnJsonObj.speech;
+		}
+		else{
+			
+			let result = await mysqlFunctions.isGetPayeeExist(req);
+			console.log('apiHandlerForTransferGetPayee=====>result===>',result);
+			console.log('apiHandlerForTransferGetPayee====>returnJsonObj===>',returnJsonObj);
+			if(result != true){
+				let balance = await mysqlFunctions.checkBalance(req);
+				if (balance!=false){
+					if(balance<amount){
+						returnJsonObj.speech = "You have insufficient balance to do this transaction. Your current account balance is $"+balance;
+						returnJsonObj.displayText = returnJsonObj.speech;
+					}
+					else{
+						if(result.length === 0){
+							returnJsonObj = {
+								"speech": `There is no ${payee} registered in your account. Make sure you have entered correctly or you can add new payee/beneficiary by stating 'add payee'.`,
+								"displayText": `There is no ${payee} registered in your account. Make sure you have entered correctly or you can add new payee/beneficiary by stating 'add payee'.`,
+								"source": "Opus-NLP"
+							}
+							// returnJsonObj.speech = `There is no ${payee} registered in your account.Make sure you have entered correctly or go for adding new payee.` ;
+							// returnJsonObj.displayText = returnJsonObj.speech;
+						}
+						if(result.length === 1){
+							returnJsonObj = await stubResponse.TransferGetPayee(req);
+							returnJsonObj = await util.payeeList(result,returnJsonObj);
+							returnJsonObj.messages[0].payload.facebook.attachment.payload.template_type = "generic";
+							console.log("Length of payee list is equal to 1");
+						}
+						if(result.length >1){
+							returnJsonObj = await stubResponse.TransferGetPayee(req);
+							returnJsonObj = await util.payeeList(result,returnJsonObj);
+							returnJsonObj.messages[0].payload.facebook.attachment.payload.template_type = "list";
+							returnJsonObj.messages[0].payload.facebook.attachment.payload.top_element_style = "compact";
+							console.log("Length of payee list is greater than 1");
+						}
+					}
+				}
+				//ERROR HANDLING
+				else{
+					returnJsonObj.speech = "We are facing some techinal issue. Please try again after some time.";
+					returnJsonObj.displayText = returnJsonObj.speech;
+				}
+			}
+			//ERROR HANDLING
+			else{
+				returnJsonObj.speech = "We are facing some techinal issue. Please try again after some time.";
+				returnJsonObj.displayText = returnJsonObj.speech;
+			}
+		}
+	} 
+
 	let speech = returnJsonObj.speech;
 	let mongoResponse = logConversationHistory(req, returnJsonObj.speech);
 	console.log("Exiting apiHandlerForTransferGetPayeeAmount==========>");
+	return res.json(returnJsonObj);
+}
+
+async function apiHandlerForTransferGetPayeeAmountUid(req,res){
+	console.log("Entering apiHandlerForTransferGetPayeeAmountUid==========>");
+	let returnJsonObj = await stubResponse.TransferGetPayeeAmount();
+	JSON.stringify(returnJsonObj);
+	let contactDetails = await mysqlFunctions.getContact(req);
+	let contact = contactDetails.contact;
+	let mailId = contactDetails.email;
+	let otpCode = await otp.sendOtp(contact,mailId);
+	await mysqlFunctions.updateOTPCode(otpCode,req);
+	let lastDigit = String(contact).substr(-4);
+	returnJsonObj.speech = `We have sent an OTP to your registered email address. Enter it when you receive it`;
+	returnJsonObj.displayText = returnJsonObj.speech;
+	let speech = returnJsonObj.speech;
+	let mongoResponse = logConversationHistory(req, returnJsonObj.speech);
+	console.log("Exiting apiHandlerForTransferGetPayeeAmountUid==========>");
 	return res.json(returnJsonObj);
 }
 
@@ -278,6 +361,7 @@ async function apiHandlerForAddPayeeGetRoutingnumber(req,res){
 	JSON.stringify(returnJsonObj);
 	//INSERT QUERY
 	let result = await mysqlFunctions.insertPayee(req);
+	console.log("Insert paye=====>",result);
 	if (result ==  false){
 		returnJsonObj.speech = "This payee already exists.";
 		returnJsonObj.displayText = returnJsonObj.speech;
@@ -323,3 +407,5 @@ exports.apiHandlerForAddPayeeGetBankname = apiHandlerForAddPayeeGetBankname;
 exports.apiHandlerForAddPayeeGetAccountnumber = apiHandlerForAddPayeeGetAccountnumber;
 exports.apiHandlerForAddPayeeGetRoutingnumber = apiHandlerForAddPayeeGetRoutingnumber;
 exports.apiHandlerForTransferGetUid = apiHandlerForTransferGetUid;
+exports.apiHandlerForTransferGetPayeeAmount = apiHandlerForTransferGetPayeeAmount;
+exports.apiHandlerForTransferGetPayeeAmountUid = apiHandlerForTransferGetPayeeAmountUid;

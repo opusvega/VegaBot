@@ -291,6 +291,11 @@ let appRouter = function(app) {
             await apiFundFunctionController.apiHandlerForAddPayeeGetRoutingnumber(req, res);
             console.log("Exiting add-payee-get-routingnumber------>");
         }
+        if(req.body.result.metadata.intentName == "transfer-get-payee-amount-uid"){
+            console.log("Entering transfer-get-payee-amount-uid------>");
+            await apiFundFunctionController.apiHandlerForTransferGetPayeeAmountUid(req, res);
+            console.log("Exiting transfer-get-payee-amount-uid------>");
+        }
         //cancelling all intent whose api is in atm api
         if(req.body.result.metadata.intentName == "cancel-all-intent"){
             console.log("Entering cancel-all-intent------>");
