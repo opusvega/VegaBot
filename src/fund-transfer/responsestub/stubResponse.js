@@ -5,7 +5,11 @@ const TransferInit = {
 	"displayText": "Sure, I can help you with that. Whom would you like to transfer the funds to?",
 	"source": "Opus-NLP"
 }
-
+const showBalance = {
+		"speech": ``,
+		"displayText": ``,
+		"source": `Opus-NLP`
+}
 //response for "transfer-get-payee" intent
 function TransferGetPayee(req){
 	const payee = req.body.result.parameters.payee;
@@ -68,8 +72,8 @@ function TransferGetOtp(req,payee){
 	const currency = req.body.result.parameters.amount.currency.currency;
 	const amount = req.body.result.parameters.amount.currency.amount;
 	const response = {
-		"speech": `Thank You for the OTP.  Your funds amounting ${currency}${amount} have been transferred to ${payee}.`,
-		"displayText": `Thank You for the OTP.  Your funds amounting ${currency}${amount} have been transferred to ${payee}.`,
+		"speech": `Thank You for the OTP.  Your funds amounting ${currency} ${amount} have been transferred to ${payee}.`,
+		"displayText": `Thank You for the OTP.  Your funds amounting ${currency} ${amount} have been transferred to ${payee}.`,
 		"source": `Opus-NLP`		
 	}
 	return response;
@@ -108,8 +112,8 @@ function AddPayeeGetNickname(req){
 function AddPayeeGetBankname(req){
 	const payee = req.body.result.parameters.payee;
 	const response = {
-		"speech": `Now, tell me ${payee}'s bank account number.`,
-		"displayText": `Now, tell me ${payee}'s bank account number.`,
+		"speech": `Now, tell me ${payee}'s 10 digit bank account number.`,
+		"displayText": `Now, tell me ${payee}'s 10 digit bank account number.`,
 		"source": `Opus-NLP`		
 	}
 	return response;
@@ -119,8 +123,8 @@ function AddPayeeGetBankname(req){
 function AddPayeeGetAccountnumber(req){
 	const payee = req.body.result.parameters.payee;
 	const response = {
-		"speech": `And along with that I will be needing ${payee}'s bank routing number.`,
-		"displayText": `And along with that I will be needing ${payee}'s bank routing number.`,
+		"speech": `And along with that I will be needing ${payee}'s 6 digit bank routing number.`,
+		"displayText": `And along with that I will be needing ${payee}'s 6 digit bank routing number.`,
 		"source": `Opus-NLP`		
 	}
 	return response;
@@ -138,7 +142,14 @@ async function AddPayeeGetRoutingnumber(req){
 	return response;
 }
 
+const miniStatement = {
+		"speech": ``,
+		"displayText": ``,
+		"source": `Opus-NLP`
+}
+
 //exporting all functions and constants
+exports.showBalance = showBalance;
 exports.TransferInit = TransferInit;
 exports.TransferGetPayee = TransferGetPayee;
 exports.TransferGetAmount = TransferGetAmount;
@@ -151,3 +162,4 @@ exports.AddPayeeGetAccountnumber = AddPayeeGetAccountnumber;
 exports.AddPayeeGetRoutingnumber = AddPayeeGetRoutingnumber;
 exports.TransferGetUid = TransferGetUid;
 exports.TransferGetPayeeAmount = TransferGetPayeeAmount;
+exports.miniStatement = miniStatement;

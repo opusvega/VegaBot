@@ -31,6 +31,10 @@ let appRouter = function(app) {
     	 res.send(ErrorMessages);
     });
 
+ app.get("/", function(req, res) {
+           res.send("success");
+     });
+
 
 
     app.post('/hook', async function(req, res) {
@@ -231,6 +235,12 @@ let appRouter = function(app) {
         }
         // select-biller-pay-bill
         //Fund transfer use cases
+        
+        if(req.body.result.metadata.intentName == "show-balance"){
+            console.log("Entering show-balance------>");
+            await apiFundFunctionController.apiHandlerForShowBalance(req, res);
+            console.log("Exiting show-balance------>");
+        }
         if(req.body.result.metadata.intentName == "transfer-init"){
             console.log("Entering router transfer-init------>");
             await apiFundFunctionController.apiHandlerForTransferInit(req, res);

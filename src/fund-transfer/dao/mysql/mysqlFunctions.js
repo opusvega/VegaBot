@@ -210,6 +210,14 @@ async function insertFundTransfer(req){
 	con.release();
 }
 
+async function getHistory(req){
+	let username = await getUsername(req);
+	let pool = await getConnectionPool();
+	let con = await pool.getConnection();
+	
+	con.release();
+}
+
 exports.isCustomerPayeeListNull = isCustomerPayeeListNull;
 exports.isGetPayeeExist = isGetPayeeExist;
 exports.insertPayee = insertPayee;

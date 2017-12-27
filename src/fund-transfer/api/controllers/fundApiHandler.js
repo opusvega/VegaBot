@@ -36,6 +36,42 @@ function logConversationHistory(req, speech) {
     return logResponse;
 }
 
+async function apiHandlerForShowBalance(req,res){
+	console.log("Entering apiHandlerForShowBalance========>");
+	//get username
+	let returnJsonObj = await stubResponse.showBalance;
+	JSON.stringify(returnJsonObj);
+	let balance = await mysqlFunctions.checkBalance(req);
+	console.log("balance=========>",balance);
+	if(balance != false){
+		console.log("INSIDE IF block");
+		returnJsonObj.speech = `Your current account balance is $${balance}.`;
+		returnJsonObj.displayText = `Your current account balance is $${balance}.`;
+	}
+	else{
+		console.log("INSIDE else block")
+		returnJsonObj.speech = `Unable to fetch balance due to technical issues. Please try again after some time.`;
+		returnJsonObj.displayText = `Unable to fetch balance due to technical issues. Please try again after some time.`;
+	}
+	let speech = returnJsonObj.speech;
+	console.log("speech=====>",speech);
+	let mongoResponse = logConversationHistory(req,speech);
+
+	let result = await context.selectContextLogFalseIntentComplete(req);
+	console.log("#################");
+	console.log(result);
+	console.log("#################");
+	if(result.length==1 ){
+	    returnJsonObj = await context.cardCreate(returnJsonObj,result);
+	}
+	if(result.length > 1){
+	    returnJsonObj = await context.listCreate(returnJsonObj,result);   
+	}
+
+	console.log("Exiting apiHandlerForShowBalance========>");
+	return res.json(returnJsonObj)
+}
+
 //api handler for "transfer-init" intent - start of context
 async function apiHandlerForTransferInit(req,res){
 	console.log('Entering apiHandlerForTransferInit=============>');
@@ -395,7 +431,34 @@ async function apiHandlerForAddPayeeGetRoutingnumber(req,res){
 	return res.json(returnJsonObj);
 }
 
+async function apiHandlerForMiniStatement(req,res){
+	console.log("Entering apiHandlerForMiniStatement==========>");
+	let returnJsonObj = await stubResponse.miniStatement;
+	JSON.stringify(returnJsonObj);
+	//get username
+	//get result of history
+	let history = await mysqlFunctions.getHistory(req);
+
+
+	let result = await context.selectContextLogFalseIntentComplete(req);
+	console.log("#################");
+	console.log(result);
+	console.log("#################");
+	if(result.length==1 ){
+	    returnJsonObj = await context.cardCreate(returnJsonObj,result);
+	}
+	if(result.length > 1){
+	    returnJsonObj = await context.listCreate(returnJsonObj,result);   
+	}
+	let speech = returnJsonObj.speech;
+	let mongoResponse = logConversationHistory(req, returnJsonObj.speech);
+	console.log("Exiting apiHandlerForMiniStatement==========>");
+	return res.json(returnJsonObj);	
+}
+
+
 //exporing all apiHandler functions
+exports.apiHandlerForShowBalance = apiHandlerForShowBalance;
 exports.apiHandlerForTransferInit = apiHandlerForTransferInit;
 exports.apiHandlerForTransferGetPayee = apiHandlerForTransferGetPayee;
 exports.apiHandlerForTransferGetAmount = apiHandlerForTransferGetAmount;
@@ -409,3 +472,4 @@ exports.apiHandlerForAddPayeeGetRoutingnumber = apiHandlerForAddPayeeGetRoutingn
 exports.apiHandlerForTransferGetUid = apiHandlerForTransferGetUid;
 exports.apiHandlerForTransferGetPayeeAmount = apiHandlerForTransferGetPayeeAmount;
 exports.apiHandlerForTransferGetPayeeAmountUid = apiHandlerForTransferGetPayeeAmountUid;
+exports.apiHandlerForMiniStatement = apiHandlerForMiniStatement;
