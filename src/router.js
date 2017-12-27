@@ -74,7 +74,22 @@ let appRouter = function(app) {
             await apiRemittanceFunctionController.apiDefaultWelcomeIntentGetUsername(req, res);
             console.log("Exiting router DefaultWelcomeIntent-get-username------>");
         }
-          if(req.body.result.metadata.intentName == "FeeEstimate"){
+        if(req.body.result.metadata.intentName == "DefaultWelcomeIntent-forgot-username"){
+            console.log("Entering router DefaultWelcomeIntent-forgot-username------>");
+            await apiRemittanceFunctionController.apiDefaultWelcomeIntentForgotUsername(req, res);
+            console.log("Exiting router DefaultWelcomeIntent-forgot-username------>");
+        }
+        if(req.body.result.metadata.intentName == "DefaultWelcomeIntent-forgot-username-get-email"){
+            console.log("Entering router DefaultWelcomeIntent-forgot-username-get-email------>");
+            await apiRemittanceFunctionController.apiDefaultWelcomeIntentForgotUsernameGetEmail(req, res);
+            console.log("Exiting router DefaultWelcomeIntent-forgot-username-get-email------>");
+        }
+        if(req.body.result.metadata.intentName == "DefaultWelcomeIntent-forgot-username-get-otp"){
+            console.log("Entering router DefaultWelcomeIntent-forgot-username-get-otp------>");
+            await apiRemittanceFunctionController.apiDefaultWelcomeIntentForgotUsernameGetOtp(req, res);
+            console.log("Exiting router DefaultWelcomeIntent-forgot-username-get-otp------>");
+        }
+        if(req.body.result.metadata.intentName == "FeeEstimate"){
             console.log("Entering router FeeEstimate------>");
             await apiRemittanceFunctionController.apiHandlerForFeeEstimate(req, res);
             console.log("Exiting router FeeEstimate------>");

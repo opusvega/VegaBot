@@ -11,7 +11,18 @@ async function getConnectionPool() {
     return false;
   }
 }
-
+async function getContact(req){
+	let email = req.body.result.parameters.email;
+	let sessionId = req.body.sessionId;
+	let pool = await getConnectionPool();
+	let con = await pool.getConnection();
+	let query = `SELECT contact,email FROM CustomerAcct WHERE email = ?;`;
+	let [result,fields] = await con.execute(query,[email]);
+	console.log("getContact------------->");
+	console.log(result);
+	con.release();
+	return result[0];
+}
 async function getContactOfUser(req){
 	//let username = req.body.result.parameters.username;
 	let username = config.senderUsername;
@@ -21,6 +32,27 @@ async function getContactOfUser(req){
 	let [result,fields] = await con.execute(query,[username]);
 	con.release();
 	return result[0].contact;
+}
+async function checkEmailId(req){
+	let emailId = req.body.result.parameters.email;
+	let query = `SELECT * FROM CustomerAcct WHERE email = ?;`;
+	let pool = await getConnectionPool();
+	let con = await pool.getConnection();
+	let [result, fields] = await con.execute(query,[emailId]);
+	return result;
+}
+
+async function insertSessionIdByEmail(req){
+	let sessionid = req.body.sessionId;
+	let email = req.body.result.parameters.email;
+	let pool = await getConnectionPool();
+	let con = await pool.getConnection();
+	let query = `UPDATE CustomerAcct SET sessionid = ? WHERE email = ?;`;
+	let result = await con.execute(query,[sessionid,email]);
+	console.log(result[0].affectedRows);
+	await con.query("commit;");
+	con.release();
+	return result;
 }
 
 async function checkIfSessionIdPresent(req){
@@ -60,7 +92,55 @@ async function getUsername(req){
 	return result[0].username;
 }
 
+async function isOTPValid(req){
+	let otpCode =req.body.result.parameters.otp;
+	let emailId = req.body.result.parameters.email;
+	let pool = await getConnectionPool();
+	let con = await pool.getConnection();
+	//let username = await getUsername(req);
+	let query = `SELECT otp FROM CustomerAcct WHERE email = ?;`;
+	let [result,fields] = await con.execute(query,[emailId]);
+	console.log("isOTPValid=========>",result[0].otp);
+	con.release();
+	if(otpCode == result[0].otp){
+		return true;
+	}
+	else{
+		return false;
+	}
+}
+
+async function getUsernameFromEmailId(req){
+	let emailId = req.body.result.parameters.email;
+	let pool = await getConnectionPool();
+	let con = await pool.getConnection();
+	let query = `SELECT username FROM CustomerAcct WHERE email = ?;`;
+	let [result,fields] = await con.execute(query,[emailId]);
+	console.log("inside getUsernameFromEmailId===>",result[0]);
+	return result[0].username;
+}
+
+async function updateOTPCode(otpCode,req){
+	let email = req.body.result.parameters.email;
+	let pool = await getConnectionPool();
+	let con = await pool.getConnection();
+	let query = `UPDATE CustomerAcct SET otp = ? WHERE email = ?`;
+	console.log(query);
+	let result = await con.execute(query,[otpCode,email]);
+	console.log("updateOTPCode-------------->");
+	console.log(result);
+	console.log(result.affectedRows);
+	await con.query("commit;");
+	con.release();
+}
+
 exports.getContactOfUser = getContactOfUser;
 exports.checkIfSessionIdPresent = checkIfSessionIdPresent;
 exports.insertSessionId = insertSessionId;
 exports.getUsername = getUsername;
+exports.getContact = getContact;
+exports.isOTPValid = isOTPValid;
+exports.getUsernameFromEmailId = getUsernameFromEmailId;
+exports.updateOTPCode = updateOTPCode;
+exports.insertSessionIdByEmail = insertSessionIdByEmail;
+exports.checkEmailId = checkEmailId;

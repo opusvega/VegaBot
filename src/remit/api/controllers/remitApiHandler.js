@@ -25,6 +25,7 @@ let feeEstimateBillPay = stubResponse.FeeEstimateBillPay;
 let feeEstimateMoneyTransferGetCountry = stubResponse.FeeEstimateMoneyTransferGetCountry;
 let feeEstimateMoneyTransferGetZipCode = stubResponse.FeeEstimateMoneyTransferGetZipCode;
 let feeEstimateMoneyTransferGetAmount = stubResponse.FeeEstimateMoneyTransferGetAmount;
+let otp = require("../../../one-time-password/otp.js");
 
 console.log('Inside apiInquiryFunctionsController...');
 console.log("Printing statusTrackTransfer1: " + statusTrackTransfer);
@@ -409,6 +410,84 @@ async function apiDefaultWelcomeIntent(req,res){
     return res.json(returnJsonObj);
 }
 
+//forgot username intent apiHandler
+async function apiDefaultWelcomeIntentForgotUsername(req,res){
+    console.log("Entering apiDefaultWelcomeIntentForgotUsername=========>");
+    let returnJsonObj = {
+        "speech" : "I can help you with that. Please confirm your registered Email ID.",
+        "displayText" : "I can help you with that. Please confirm your registered Email ID.",
+        "source" : "Opus-NLP"
+    }
+    JSON.stringify(returnJsonObj);
+    let speech = returnJsonObj.speech;
+    console.log("Exiting apiDefaultWelcomeIntentForgotUsername=======>");
+    console.log(returnJsonObj);
+    let mongoResponse = logConversationHistory(req, speech);
+    return res.json(returnJsonObj);
+}
+
+async function apiDefaultWelcomeIntentForgotUsernameGetEmail(req,res){
+    console.log("Entering apiDefaultWelcomeIntentForgotUsernameGetEmail");
+    let result = await mysqlFunctions.checkEmailId(req);
+    let returnJsonObj = {
+        "speech" : "",
+        "displayText" : "",
+        "source" : "Opus-NLP"
+    };
+    JSON.stringify(returnJsonObj);
+    if(result.length != 0){
+
+        let contactDetails = await mysqlFunctions.getContact(req);
+        let contact = contactDetails.contact;
+        let mailId = contactDetails.email;
+        let otpCode = await otp.sendOtp(contact,mailId);
+        await mysqlFunctions.updateOTPCode(otpCode,req);
+        returnJsonObj.speech = "I have sent an OTP to your registered Email ID. Enter it when you receive it.";
+        returnJsonObj.displayText = returnJsonObj.speech;
+    }
+    else{
+        returnJsonObj = {
+            "speech" : "It seems you have entered unregistered Email ID. Please try again.",
+            "displayText" : "It seems you have entered unregistered Email ID. Please try again.",
+            "source" : "Opus-NLP"
+        }
+    }
+    let speech = returnJsonObj.speech;
+    let mongoResponse = logConversationHistory(req, returnJsonObj.speech);
+    console.log("Exiting apiDefaultWelcomeIntentForgotUsernameGetEmail");
+    return res.json(returnJsonObj);
+}
+
+async function apiDefaultWelcomeIntentForgotUsernameGetOtp(req,res){
+    console.log("Entering apiDefaultWelcomeIntentForgotUsernameGetOtp==========>");
+
+    let resultOtpValid = await mysqlFunctions.isOTPValid(req);
+    let returnJsonObj = {
+        "speech" : "",
+        "displayText" : "",
+        "source" : "Opus-NLP"
+    };
+    JSON.stringify(returnJsonObj);
+    if(resultOtpValid == true){
+        let username = await mysqlFunctions.getUsernameFromEmailId(req);
+        await otp.sendUsername(req,username);
+        await mysqlFunctions.insertSessionIdByEmail(req);
+        returnJsonObj.speech = "I have sent your username to your registered Email ID. Please check for it.";
+        returnJsonObj.displayText = returnJsonObj.speech;
+    }
+    else{
+
+        returnJsonObj.speech = `Your OTP was incorrect. Please try again.`;
+        returnJsonObj.displayText = returnJsonObj.speech;
+    }
+
+    let speech = returnJsonObj.speech;
+    let mongoResponse = logConversationHistory(req, returnJsonObj.speech);
+    //add end context code
+    console.log("Exiting apiDefaultWelcomeIntentForgotUsernameGetOtp==========>");
+    return res.json(returnJsonObj);
+}
+
 async function apiDefaultWelcomeIntentGetUsername(req,res){
     console.log("Entering apiDefaultWelcomeIntentGetUsername ------>")
     let result = await mysqlFunctions.insertSessionId(req);
@@ -710,3 +789,6 @@ exports.apiHandlerForAgentLocatorGetCity = apiHandlerForAgentLocatorGetCity;
 exports.apiDefaultWelcomeIntent = apiDefaultWelcomeIntent;
 exports.apiHandlerForAgentLocator = apiHandlerForAgentLocator;
 exports.apiDefaultWelcomeIntentGetUsername = apiDefaultWelcomeIntentGetUsername;
+exports.apiDefaultWelcomeIntentForgotUsername = apiDefaultWelcomeIntentForgotUsername;
+exports.apiDefaultWelcomeIntentForgotUsernameGetOtp = apiDefaultWelcomeIntentForgotUsernameGetOtp;
+exports.apiDefaultWelcomeIntentForgotUsernameGetEmail = apiDefaultWelcomeIntentForgotUsernameGetEmail;

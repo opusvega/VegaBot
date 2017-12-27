@@ -69,7 +69,7 @@ async function apiHandlerForShowBalance(req,res){
 	}
 
 	console.log("Exiting apiHandlerForShowBalance========>");
-	return res.json(returnJsonObj)
+	return res.json(returnJsonObj);
 }
 
 //api handler for "transfer-init" intent - start of context

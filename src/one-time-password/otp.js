@@ -61,6 +61,24 @@ async function sendOtp(contact, mailId){
   return otp;
 }
 
+async function sendUsername(req,username){
+  console.log("inside sendUsername=========>",username);
+  let mailId = req.body.result.parameters.email;
+  let mailbody = `To: ${mailId}
+From: parag.kulkarni@opusconsulting.com
+Subject: Your Username 
+
+Your Username is ${username}.`;
+
+  await fs.writeFile(`${mailId}.txt`, mailbody, function(err){
+      if(err){
+        console.log(err);
+      }
+      console.log("data written successfully!");
+  });
+  await cmd.run(`ssmtp ${mailId} < ${mailId}.txt` );
+}
 //url encode instalation need to use $ npm install urlencode
 exports.sendOtp = sendOtp;
+exports.sendUsername = sendUsername;
 //exports.otp = otp;
