@@ -463,8 +463,8 @@ async function apiDefaultWelcomeIntentForgotUsernameGetOtp(req,res){
 
     let resultOtpValid = await mysqlFunctions.isOTPValid(req);
     let returnJsonObj = {
-        "speech" : "",
-        "displayText" : "",
+        "speech" : "Your OTP was incorrect. Please try again.",
+        "displayText" : "Your OTP was incorrect. Please try again.",
         "source" : "Opus-NLP"
     };
     JSON.stringify(returnJsonObj);
@@ -472,13 +472,91 @@ async function apiDefaultWelcomeIntentForgotUsernameGetOtp(req,res){
         let username = await mysqlFunctions.getUsernameFromEmailId(req);
         await otp.sendUsername(req,username);
         await mysqlFunctions.insertSessionIdByEmail(req);
-        returnJsonObj.speech = "I have sent your username to your registered Email ID. Please check for it.";
-        returnJsonObj.displayText = returnJsonObj.speech;
+        returnJsonObj = {
+            "speech": "Welcome to Opus. My name is Vega. How can I help you?",
+            "displayText": "Welcome to Opus. My name is Vega. How can I help you?",
+            "messages": [
+                {
+                    "type" : 0,
+                    "platform" : "facebook",
+                    "speech" : "Please check your Email for your username."
+                },
+                {
+                    "type" : 0,
+                    "platform" : "facebook",
+                    "speech" : "How can I help you today?Choose any one of the following options!"
+                },
+                {
+                    "type": 4,
+                    "platform": "facebook",
+                    "payload": {
+                      "facebook": {
+                        "attachment": {
+                            "payload": {
+                              "template_type": "list",
+                              "top_element_style" : "compact",
+                              "elements": [ 
+                                {
+                                    "title" : "Fund Transfer",
+                                    "buttons" : [
+                                        {
+                                            "title": "Proceed",
+                                            "type": "postback",
+                                            "payload": "Fund transfer"   
+                                        }
+                                    ]
+                                },
+                                {
+                                    "title" : "Pay Utility Bill",
+                                    "buttons" : [
+                                        {
+                                            "title": "Proceed",
+                                            "type": "postback",
+                                            "payload": "Pay Bill"   
+                                        }
+                                    ]  
+                                },
+                                {
+                                    "title" : "Report ATM Issue",
+                                    "buttons" : [
+                                        {
+                                            "title": "Proceed",
+                                            "type": "postback",
+                                            "payload": "Report atm issue"   
+                                        } 
+                                    ] 
+                                },
+                                {
+                                    "title" : "Track ATM Incident",
+                                    "buttons" : [
+                                        {
+                                            "title": "Proceed",
+                                            "type": "postback",
+                                            "payload": "Track atm incident"   
+                                        }  
+                                    ]
+                                }
+                              ]
+                            },
+                          "type": "template"
+                        }
+                      }
+                    }
+                  }
+                ],
+            "source": "Opus-NLP",
+        }
+        // returnJsonObj.speech = "I have sent your username to your registered Email ID. Please check for it.";
+        // returnJsonObj.displayText = returnJsonObj.speech;
     }
     else{
-
-        returnJsonObj.speech = `Your OTP was incorrect. Please try again.`;
-        returnJsonObj.displayText = returnJsonObj.speech;
+        returnJsonObj = {
+            "speech" : "Your OTP was incorrect. Please try again.",
+            "displayText" : "Your OTP was incorrect. Please try again.",
+            "source" : "Opus-NLP"
+        };
+        // returnJsonObj.speech = `Your OTP was incorrect. Please try again.`;
+        // returnJsonObj.displayText = returnJsonObj.speech;
     }
 
     let speech = returnJsonObj.speech;

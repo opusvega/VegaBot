@@ -5,6 +5,7 @@ let apiRemittanceFunctionController = require('./remit/api/controllers/remitApiH
 let apiAtmFunctionController = require('./atm/api/controllers/atmApiHandler.js');
 let apiBankFunctionController = require('./billpay/api/controllers/bankApiHandler.js');
 let apiFundFunctionController = require('./fund-transfer/api/controllers/fundApiHandler.js');
+let mysqlFunctions = require('./mysql-functions/mysqlFunctions.js');
 let fs = require('fs');
 
 
@@ -39,7 +40,7 @@ let appRouter = function(app) {
 
     app.post('/hook', async function(req, res) {
         console.log("inside router app.post: ");
-        console.log(req.body);
+        //console.log(req.body);
 
         //All remittance cases
         if (req.body.result.metadata.intentName == "TrackTransfer") {
@@ -67,6 +68,11 @@ let appRouter = function(app) {
         if(req.body.result.metadata.intentName == "DefaultWelcomeIntent"){
             console.log("Entering router DefaultWelcomeIntent------>");
             await apiRemittanceFunctionController.apiDefaultWelcomeIntent(req, res);
+            // let temp = await apiRemittanceFunctionController.apiDefaultWelcomeIntent(req, res);
+            // console.log("+++++++++++++++++++++++++");
+            // //console.log(req.body);
+            // console.log(JSON.parse(temp));
+            // console.log("+++++++++++++++++++++++++");
             console.log("Exiting router DefaultWelcomeIntent------>");
         }
         if(req.body.result.metadata.intentName == "DefaultWelcomeIntent-get-username"){
@@ -119,6 +125,7 @@ let appRouter = function(app) {
         if(req.body.result.metadata.intentName.includes("welcome-intent")){
             console.log("Entering router DefaultWelcomeIntent------>");
             await apiAtmFunctionController.apiDefaultWelcomeIntent(req, res);
+            
             console.log("Exiting router DefaultWelcomeIntent------>");
         }
         if(req.body.result.metadata.intentName.includes("smalltalk")){
@@ -327,6 +334,24 @@ let appRouter = function(app) {
             await apiAtmFunctionController.apiHandlerForCancelAllIntent(req, res);
             console.log("Exiting cancel-all-intent------>");
         }
+        // console.log("+++++++++++++++++++++++++");
+        // console.log(req.body);
+        // console.log(res.body);
+        // console.log("+++++++++++++++++++++++++");
+        // let responseRecord = await mysqlFunctions.checkResponseStatus(req,res);
+        // console.log("+++++++++++++++++++++++++");
+        // console.log(req.body);
+        // console.log(res.body);
+        // console.log("+++++++++++++++++++++++++");
+        // if (responseRecord == true){
+        //     let returnJsonObject = {
+        //         "speech" : "It seems that I am not able to help you out. Please contact our customer care.",
+        //         "displayText" : "It seems that I am not able to help you out. Please contact our customer care.",
+        //         "source" : "Opus-NLP"
+        //     };
+        //     JSON.stringify(returnJsonObject);
+        //     return res.json(returnJsonObject);
+        // }
     });
 
 }

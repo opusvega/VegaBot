@@ -95,12 +95,16 @@ async function insertPayee(req){
 	let bankname = req.body.result.parameters.bankname;
 	let accountnumber = req.body.result.parameters.accountnumber;
 	let routingnumber = req.body.result.parameters.routingnumber;
+	routingnumber = routingnumber.replace(/\s/g,'');
 	let query = "INSERT INTO Payee VALUES('"+payee+"','"+nickname+
 				  "','"+bankname+"',"+routingnumber+","+accountnumber+
 				  ",'"+username+"',DEFAULT);";
+	console.log("inside insertPayee========>",query);
 	try{
 		let result = await con.query(query);
+		console.log("before commit=====>",result);
 		await con.query("commit;");
+		console.log("After commit=====>");
 		con.release();	
 		return true;
 	}

@@ -134,6 +134,54 @@ async function updateOTPCode(otpCode,req){
 	con.release();
 }
 
+async function checkResponseStatus(req,res){
+	let speech = res.body.speech;
+	let sessionId = req.body.sessionId;
+	let pool = await getConnectionPool();
+	let con = await pool.getConnection();
+	let query = `SELECT * FROM resrecord WHERE speech = ? AND sessionid = ?;`;
+	let [result, fields] = await con.execute(query,[speech, sessionId]);
+	if(result.length !=0 ){
+		if (result[0].response == speech && result[0].count == 3 ){
+			await setCountZero(speech, sessionId);
+			return true;
+		}
+		else{
+			await updateResponseCount(speech, sessionId);
+			return false;
+		}
+	}
+	else{
+		await insertResponseRecord(speech, sessionId);
+		return false;
+	}
+}
+
+async function setCountZero(speech,sessionId){
+	let pool = await getConnectionPool();
+	let con = await pool.getConnection();
+	let query = `UPDATE resrecord SET count = 0 WHERE speech = ? AND sessionid = ?;`;
+	let result = await con.execute(query,[speech,sessionId]);
+	console.log("inside setCountZero===>",result);
+}
+
+async function updateResponseCount(speech, sessionId){
+	let pool = await getConnectionPool();
+	let con = await pool.getConnection();
+	let query = `UPDATE resrecord SET count = count+1 WHERE speech = ? AND sessionid = ?;`;
+	let result = await con.execute(query,[speech,sessionId]);
+	console.log("inside updateResponseCount===>",result);
+}
+
+async function insertResponseRecord(speech, sessionId){
+	let pool = await getConnectionPool();
+	let con = await pool.getConnection();
+	let query = `INSERT INTO resrecord VALUES (?,0,?);`;
+	let result = await con.execute(query,[speech,sessionId]);
+	console.log("inside setCountZero===>",result);
+}
+
+exports.checkResponseStatus = checkResponseStatus;
 exports.getContactOfUser = getContactOfUser;
 exports.checkIfSessionIdPresent = checkIfSessionIdPresent;
 exports.insertSessionId = insertSessionId;
