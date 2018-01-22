@@ -7,7 +7,7 @@ let apiBankFunctionController = require('./billpay/api/controllers/bankApiHandle
 let apiFundFunctionController = require('./fund-transfer/api/controllers/fundApiHandler.js');
 let mysqlFunctions = require('./mysql-functions/mysqlFunctions.js');
 let fs = require('fs');
-
+let nexmoJson = require('./call.js')
 
 let appRouter = function(app) {
     // Configuration and Property Lookup type requests
@@ -16,7 +16,11 @@ let appRouter = function(app) {
         let PaymentType = config.PaymentType;
     	res.send(PaymentType);
     });
-
+    app.get("/nexmoCall", function(req, res) {
+        //res.send("Hello World");
+        let nexmoCallJson = nexmoJson.call;
+        res.send(nexmoCallJson);
+    });
     app.get("/RemitProducts", function(req, res) {
     	 let RemitProducts = config.RemitProducts;
     	 res.send(RemitProducts);

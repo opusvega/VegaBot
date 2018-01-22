@@ -193,7 +193,7 @@ async function apiHandlerForTrackAtmIncidentGetIncId(req,res){
     let INCID = req.body.result.parameters.incid;
     let userchatsummary = '';
     let botchatsummary = '';
-
+    let returnJsonObj;
     console.log("Requested INCID status----->"+INCID);
 
     let rows = await MysqlFunctions.selectIncidentStatus(req);
@@ -201,13 +201,13 @@ async function apiHandlerForTrackAtmIncidentGetIncId(req,res){
         // let startintentname = 'track-atm-incident';
         // await context.updateContextLogEndIntentName(req,startintentname);
         console.log("got rows from callback---->"+rows);
-        let returnJsonObj = await stubResponse.TrackAtmIncidentGetIncId(rows);
+        returnJsonObj = await stubResponse.TrackAtmIncidentGetIncId(rows);
         JSON.stringify(returnJsonObj);
     }
     //ERROR HANDLING
     else{
         console.log("ERROR IN selectIncidentStatus ");
-        let returnJsonObj = stubResponse.TrackAtmIncidentGetIncId(rows);
+        returnJsonObj = stubResponse.TrackAtmIncidentGetIncId(rows);
         JSON.stringify(returnJsonObj);
         returnJsonObj.speech = `Cannot fetch Incident Status`;
         returnJsonObj.displayText = returnJsonObj.speech;

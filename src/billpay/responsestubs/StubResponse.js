@@ -169,7 +169,8 @@ function AddPhoneBillerGetBiller(req){
       AutoPayrequired : ${autopayrequired}
       AutoPayMode : ${autopaymode}
       Limit Amount : ${limitamount}
-      CID : ${cid}`,
+      CID : ${cid}
+      Do you want to add this biller?`,
       "displayText": `Let me confirm your details.
       Phoneprovider : ${phoneprovider}
       Biller : ${billers}

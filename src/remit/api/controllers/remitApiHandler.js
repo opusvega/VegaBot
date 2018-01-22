@@ -207,8 +207,8 @@ function apiHandlerForFeeInquiry(req, res) {
 async function apiDefaultWelcomeIntent(req,res){
     console.log("Entering apiDefaultWelcomeIntent ------>")
     let returnJsonObj = {
-        "speech": "Welcome to Opus. My name is Vega. How can I help you?",
-        "displayText": "Welcome to Opus. My name is Vega. How can I help you?",
+        "speech": "Welcome to Opus. My name is Vega. How can I help you?\nChoose any one of the following options!\nFund Transfer\nPay Utility Bill\nReport ATM Incident\nTrack ATM Incident",
+        "displayText": "Welcome to Opus. My name is Vega. How can I help you?\nChoose any one of the following options!\nFund Transfer\nPay Utility Bill\nReport ATM Incident\nTrack ATM Incident",
         "messages": [
             {
                 "type" : 0,
@@ -473,8 +473,8 @@ async function apiDefaultWelcomeIntentForgotUsernameGetOtp(req,res){
         await otp.sendUsername(req,username);
         await mysqlFunctions.insertSessionIdByEmail(req);
         returnJsonObj = {
-            "speech": "Welcome to Opus. My name is Vega. How can I help you?",
-            "displayText": "Welcome to Opus. My name is Vega. How can I help you?",
+            "speech": "Welcome to Opus. My name is Vega. How can I help you?\nChoose any one of the following options!\nFund Transfer\nPay Utility Bill\nReport ATM Incident\nTrack ATM Incident",
+            "displayText": "Welcome to Opus. My name is Vega. How can I help you?\nChoose any one of the following options!\nFund Transfer\nPay Utility Bill\nReport ATM Incident\nTrack ATM Incident",
             "messages": [
                 {
                     "type" : 0,
@@ -579,8 +579,8 @@ async function apiDefaultWelcomeIntentGetUsername(req,res){
     }
     else{
         returnJsonObj = {
-        "speech": "Welcome to Opus. My name is Vega. How can I help you?",
-        "displayText": "Welcome to Opus. My name is Vega. How can I help you?",
+        "speech": "Welcome to Opus. My name is Vega. How can I help you?\nChoose any one of the following options!\nFund Transfer\nPay Utility Bill\nReport ATM Incident\nTrack ATM Incident",
+        "displayText": "Welcome to Opus. My name is Vega. How can I help you?\nChoose any one of the following options!\nFund Transfer\nPay Utility Bill\nReport ATM Incident\nTrack ATM Incident",
         "messages": [
             {
                 "type" : 0,
