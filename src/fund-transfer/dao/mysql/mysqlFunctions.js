@@ -12,9 +12,21 @@ async function getConnectionPool() {
   }
 }
 
+async function checkNickname(req){
+	let nickname = req.body.result.parameters.nickname;
+	let username = await getUsername(req);
+	let pool = await getConnectionPool();
+	let con = await pool.getConnection();
+	let query = `SELECT * FROM Payee WHERE nickname = ? AND customername = ?;`;
+	let [result,fields] = await con.execute(query,[nickname, username]);
+	con.release();
+	console.log("checkNickname result=-=========>",result);
+	console.log("checkNickname result[0]=========>",result[0])
+	return result;
+}
 
 async function getContact(req){
-	let username = config.senderUsername;
+	let username = await getUsername(req);
 	let sessionId = req.body.sessionId;
 	let pool = await getConnectionPool();
 	let con = await pool.getConnection();
@@ -72,7 +84,7 @@ async function isGetPayeeExist(req){
 	let payee = req.body.result.parameters.payee;
 	// let query = `SELECT * FROM Payee WHERE nickname LIKE "%'+payee+'%" OR payeename LIKE "%'+payee+'%" AND customername = ?;`;
 	let query = `SELECT * FROM Payee WHERE customername = ? AND (nickname LIKE '%${payee}%' OR payeename LIKE '%${payee}%');`;
-	console.log(query);
+	console.log(query,payee);
 	try{
 		let [result,fields] = await con.execute(query, [username]);
 		console.log('isGetPayeeExist=====>',result);
@@ -175,12 +187,16 @@ async function updateBalance(req){
 }
 
 async function getTransferDetails(req){
-	let uid = req.body.result.parameters.uid;
+	let username = await getUsername(req);
+	console.log(username);
+	let nickname = req.body.result.parameters.nickname;
+	console.log(nickname);
 	let pool = await getConnectionPool();
 	let con = await pool.getConnection();
-	let newUid = parseInt(uid.substr(-7));
-	let query = `SELECT * FROM Payee WHERE uid = ?;`;
-	let [result, fields] = await con.execute(query,[newUid]);
+	//let newUid = parseInt(uid.substr(-7));
+	let query = `SELECT * FROM Payee WHERE nickname = ? AND customername = ?;`;
+	let [result, fields] = await con.execute(query,[nickname,username]);
+	console.log(result);
 	con.release();
 	return result[0];
 
@@ -232,3 +248,4 @@ exports.isOTPValid = isOTPValid;
 exports.updateBalance = updateBalance;
 exports.insertFundTransfer = insertFundTransfer;
 exports.getTransferDetails = getTransferDetails;
+exports.checkNickname = checkNickname;

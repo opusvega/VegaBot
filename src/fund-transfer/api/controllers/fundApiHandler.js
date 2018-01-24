@@ -4,11 +4,12 @@ let stubResponse = require('../../responsestub/stubResponse.js');
 let conversationHistory = require('../../../history/LogHandler.js');
 let util = require('../../utility/util.js');
 let config = require("../../../config.js");
-
+let numToWords = require("../../../reflookup/numToWords.js");
 let context = require("../../../context/contextHandler.js");
 let intentNameLookup = require("../../../reflookup/IntentNames.js");
 
 let otp = require("../../../one-time-password/otp.js");
+let nodeMailer = require("../../../node-mailer/index.js");
 
 //log conversation history
 function logConversationHistory(req, speech) {
@@ -109,8 +110,8 @@ async function apiHandlerForTransferInit(req,res){
 async function apiHandlerForTransferGetPayee(req,res){
 	let payee = req.body.result.parameters.payee;
 	console.log('Entering apiHandlerForTransferGetPayee==========>');
-	let returnJsonObj = await stubResponse.TransferGetPayee(req);
-	JSON.stringify(returnJsonObj);
+	let returnJsonObj = JSON.parse(JSON.stringify(await stubResponse.TransferGetPayee(req)));
+	// JSON.stringify(returnJsonObj);
 	let result = await mysqlFunctions.isGetPayeeExist(req);
 	console.log('apiHandlerForTransferGetPayee=====>result===>',result);
 	console.log('apiHandlerForTransferGetPayee====>returnJsonObj===>',returnJsonObj);
@@ -125,11 +126,20 @@ async function apiHandlerForTransferGetPayee(req,res){
 			// returnJsonObj.displayText = returnJsonObj.speech;
 		}
 		if(result.length === 1){
+			returnJsonObj.speech = `I have found ${result[0].payeename} in ${result[0].bankname} bank having nickname ${result[0].nickname}.
+			To proceed further please state nickname or if you want to add new payee please state new payee.`;
+			returnJsonObj.displayText = returnJsonObj.speech;
 			returnJsonObj = await util.payeeList(result,returnJsonObj);
 			returnJsonObj.messages[0].payload.facebook.attachment.payload.template_type = "generic";
 			console.log("Length of payee list is equal to 1");
 		}
 		if(result.length >1){
+			returnJsonObj.speech = `I have found ${result.length} payee's, `;
+			for(let i=0;i<result.length;i++){
+				returnJsonObj.speech += `${numToWords.numToWords[i+1]} is ${result[i].payeename}, in ${result[i].bankname} with nickname ${result[i].nickname}, `;
+			}
+			returnJsonObj.speech += `. Please state the nickname to whom you wish to transfer.`;
+			returnJsonObj.displayText = returnJsonObj.speech;
 			returnJsonObj = await util.payeeList(result,returnJsonObj);
 			returnJsonObj.messages[0].payload.facebook.attachment.payload.template_type = "list";
 			returnJsonObj.messages[0].payload.facebook.attachment.payload.top_element_style = "compact";
@@ -178,10 +188,12 @@ async function apiHandlerForTransferGetAmount(req,res){
 			let contactDetails = await mysqlFunctions.getContact(req);
 			let contact = contactDetails.contact;
 			let mailId = contactDetails.email;
-			let otpCode = await otp.sendOtp(contact,mailId);
+			//let otpCode = await otp.sendOtp(contact,mailId);
+			let otpCode = await nodeMailer.sendOtp(mailId);
 			await mysqlFunctions.updateOTPCode(otpCode,req);
-			let lastDigit = String(contact).substr(-4);
-			returnJsonObj.speech = `We have sent an OTP to your registered email address. Enter it when you receive it`;
+			console.log("TransferGetAmount====otp : ",otpCode);
+			//let lastDigit = String(contact).substr(-4);
+			returnJsonObj.speech = `We have sent an O.T.P to your registered email address. Enter it when you receive it`;
 			returnJsonObj.displayText = returnJsonObj.speech;
 		}
 	}
@@ -201,9 +213,10 @@ async function apiHandlerForTransferGetOtp(req,res){
 	let otp =req.body.result.parameters.otp;
 	console.log("Entering apiHandlerForTransferGetOtp==========>");
 	let payeeDetails = await mysqlFunctions.getTransferDetails(req); 
+	console.log(`payee details ===>`,payeeDetails);
 	let resultOtpValid = await mysqlFunctions.isOTPValid(otp,req);
-	let returnJsonObj = await stubResponse.TransferGetOtp(req,payeeDetails.payeename);
-	JSON.stringify(returnJsonObj);
+	let returnJsonObj = JSON.parse(JSON.stringify(await stubResponse.TransferGetOtp(req,payeeDetails.payeename)));
+	//JSON.stringify(returnJsonObj);
 	if(resultOtpValid == true){
 		await mysqlFunctions.insertFundTransfer(req);
 		await mysqlFunctions.updateBalance(req);
@@ -243,8 +256,7 @@ async function apiHandlerForTransferGetPayeeAmount(req,res){
 	console.log("Entering apiHandlerForTransferGetPayeeAmount==========>");
 	let amount = req.body.result.parameters.amount.currency.amount;
 	let payee = req.body.result.parameters.payee;
-	let returnJsonObj = await stubResponse.TransferGetPayeeAmount();	
-	JSON.stringify(returnJsonObj);
+	let returnJsonObj = JSON.parse(JSON.stringify(await stubResponse.TransferGetPayeeAmount()));	
 
 	let flag = await mysqlFunctions.isCustomerPayeeListNull(req); 
 	console.log("FLAG--------->",flag);
@@ -282,16 +294,27 @@ async function apiHandlerForTransferGetPayeeAmount(req,res){
 							// returnJsonObj.displayText = returnJsonObj.speech;
 						}
 						if(result.length === 1){
+							
 							returnJsonObj = await stubResponse.TransferGetPayee(req);
 							returnJsonObj = await util.payeeList(result,returnJsonObj);
 							returnJsonObj.messages[0].payload.facebook.attachment.payload.template_type = "generic";
+							returnJsonObj.speech = `I have found ${result[0].payeename} in ${result[0].bankname} bank having nickname ${result[0].nickname}.
+							To proceed further please state nickname or if you want to add new payee please state new payee.`;
+							returnJsonObj.displayText = returnJsonObj.speech;
 							console.log("Length of payee list is equal to 1");
 						}
 						if(result.length >1){
+							
 							returnJsonObj = await stubResponse.TransferGetPayee(req);
 							returnJsonObj = await util.payeeList(result,returnJsonObj);
 							returnJsonObj.messages[0].payload.facebook.attachment.payload.template_type = "list";
 							returnJsonObj.messages[0].payload.facebook.attachment.payload.top_element_style = "compact";
+							returnJsonObj.speech = `I have found ${result.length} payee's, `;
+							for(let i=0;i<result.length;i++){
+								returnJsonObj.speech += `${numToWords.numToWords[i+1]} is ${result[i].payeename}, in ${result[i].bankname} with nickname ${result[i].nickname}, `;
+							}
+							returnJsonObj.speech += `. Please state the nickname to whom you wish to transfer.`;
+							returnJsonObj.displayText = returnJsonObj.speech;
 							console.log("Length of payee list is greater than 1");
 						}
 					}
@@ -323,7 +346,8 @@ async function apiHandlerForTransferGetPayeeAmountUid(req,res){
 	let contactDetails = await mysqlFunctions.getContact(req);
 	let contact = contactDetails.contact;
 	let mailId = contactDetails.email;
-	let otpCode = await otp.sendOtp(contact,mailId);
+	// let otpCode = await otp.sendOtp(contact,mailId);
+	let otpCode = await nodeMailer.sendOtp(mailId);
 	await mysqlFunctions.updateOTPCode(otpCode,req);
 	let lastDigit = String(contact).substr(-4);
 	returnJsonObj.speech = `We have sent an OTP to your registered email address. Enter it when you receive it`;
@@ -342,7 +366,7 @@ async function apiHandlerForAddPayeeInit(req,res){
 	let speech = returnJsonObj.speech;
 	let mongoResponse = logConversationHistory(req, returnJsonObj.speech);
 	console.log("Exiting apiHandlerForAddPayeeInit==========>");
-	context.insertContextLog(req,"add-payee-get-routingnumber");
+	context.insertContextLog(req,"add-payee-get-accountnumber");
 	return res.json(returnJsonObj);
 }
 
@@ -360,14 +384,18 @@ async function apiHandlerForAddPayeeGetPayeename(req,res){
 //api handler for "add-payee-get-nickname" intent
 async function apiHandlerForAddPayeeGetNickname(req,res){
 	console.log("Entering apiHandlerForAddPayeeGetNickname==========>");
-	let returnJsonObj = await stubResponse.AddPayeeGetNickname(req);
-	JSON.stringify(returnJsonObj);
+	let returnJsonObj = await JSON.parse(JSON.stringify(stubResponse.AddPayeeGetNickname(req)));
+	// JSON.stringify(returnJsonObj);
+	let result = await mysqlFunctions.checkNickname(req);
+	if (result.length != 0){
+		returnJsonObj.speech = "This nickname already exist. Please try another one.";
+		returnJsonObj.displayText = returnJsonObj.speech;
+	}
 	let speech = returnJsonObj.speech;
 	let mongoResponse = logConversationHistory(req, returnJsonObj.speech);
 	console.log("Exiting apiHandlerForAddPayeeGetNickname==========>");
 	return res.json(returnJsonObj);
 }
-
 //api handler for "add-payee-get-bankname" intent
 async function apiHandlerForAddPayeeGetBankname(req,res){
 	console.log("Entering apiHandlerForAddPayeeGetBankname==========>");
@@ -382,8 +410,44 @@ async function apiHandlerForAddPayeeGetBankname(req,res){
 //api handler for "add-payee-get-accountnumber" intent
 async function apiHandlerForAddPayeeGetAccountnumber(req,res){
 	console.log("Entering apiHandlerForAddPayeeGetAccountnumber==========>");
-	let returnJsonObj = await stubResponse.AddPayeeGetAccountnumber(req);
-	JSON.stringify(returnJsonObj);
+	let accountNumber = req.body.result.parameters.accountnumber;
+	let returnJsonObj = JSON.parse(JSON.stringify(await stubResponse.AddPayeeGetAccountnumber(req)));
+	if(accountNumber.length != 10){
+		returnJsonObj.speech = `Please enter valid 10 digit account number`;
+		returnJsonObj.displayText = returnJsonObj.speech;
+	}
+	else{
+		let result = await mysqlFunctions.insertPayee(req);
+		console.log("Insert paye=====>",result);
+		if (result ==  false){
+			returnJsonObj.speech = "This payee already exists.";
+			returnJsonObj.displayText = returnJsonObj.speech;
+		}
+
+		let speech = returnJsonObj.speech;
+		let mongoResponse = logConversationHistory(req, returnJsonObj.speech);
+
+		//add end context code
+		let updateContextLogIntentCompleteValue = await context.updateContextLogIntentComplete(req);
+
+		if(updateContextLogIntentCompleteValue != false){
+	        console.log("updateContextLogIntentComplete SUCCESSFULL");
+	        let result = await context.selectContextLogFalseIntentComplete(req);
+	        console.log("#################");
+	        console.log(result);
+	        console.log("#################");
+	        if(result.length==1 ){
+	            returnJsonObj = await context.cardCreate(returnJsonObj,result);
+	        }
+	        if(result.length > 1){
+	            returnJsonObj = await context.listCreate(returnJsonObj,result);   
+	        }
+
+	   	}
+	    else{
+	        console.log("updateContextLogIntentComplete ERROR....");
+	    }
+	}
 	let speech = returnJsonObj.speech;
 	let mongoResponse = logConversationHistory(req, returnJsonObj.speech);
 	console.log("Exiting apiHandlerForAddPayeeGetAccountnumber==========>");
@@ -393,40 +457,13 @@ async function apiHandlerForAddPayeeGetAccountnumber(req,res){
 //api handler for "add-payee-get-routingnumber" intent - end of context
 async function apiHandlerForAddPayeeGetRoutingnumber(req,res){
 	console.log("Entering apiHandlerForAddPayeeGetRoutingnumber==========>");
-	let returnJsonObj = await stubResponse.AddPayeeGetRoutingnumber(req);
-	JSON.stringify(returnJsonObj);
+	let returnJsonObj = JSON.parse(JSON.stringify( await stubResponse.AddPayeeGetRoutingnumber(req)));
 	//INSERT QUERY
-	let result = await mysqlFunctions.insertPayee(req);
-	console.log("Insert paye=====>",result);
-	if (result ==  false){
-		returnJsonObj.speech = "This payee already exists.";
+	let routingNumber = req.body.result.parameters.routingnumber;
+	if (routingNumber.length != 6){
+		returnJsonObj.speech = `Please enter valid 6 digit routing number`;
 		returnJsonObj.displayText = returnJsonObj.speech;
 	}
-
-	let speech = returnJsonObj.speech;
-	let mongoResponse = logConversationHistory(req, returnJsonObj.speech);
-
-	//add end context code
-	let updateContextLogIntentCompleteValue = await context.updateContextLogIntentComplete(req);
-
-	if(updateContextLogIntentCompleteValue != false){
-        console.log("updateContextLogIntentComplete SUCCESSFULL");
-        let result = await context.selectContextLogFalseIntentComplete(req);
-        console.log("#################");
-        console.log(result);
-        console.log("#################");
-        if(result.length==1 ){
-            returnJsonObj = await context.cardCreate(returnJsonObj,result);
-        }
-        if(result.length > 1){
-            returnJsonObj = await context.listCreate(returnJsonObj,result);   
-        }
-
-   	}
-    else{
-        console.log("updateContextLogIntentComplete ERROR....");
-    	}
-
 	console.log("Exiting apiHandlerForAddPayeeGetRoutingnumber==========>");
 	return res.json(returnJsonObj);
 }

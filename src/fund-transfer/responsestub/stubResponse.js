@@ -101,8 +101,8 @@ function AddPayeeGetPayeename(req){
 function AddPayeeGetNickname(req){
 	const payee = req.body.result.parameters.payee;
 	const response = {
-		"speech": `Okay. Tell me ${payee}'s bank name.`,
-		"displayText": `Okay. Tell me ${payee}'s bank name.`,
+		"speech": `Okay. Tell me ${payee}'s bank routing number.`,
+		"displayText": `Okay. Tell me ${payee}'s bank routing number.`,
 		"source": `Opus-NLP`		
 	}
 	return response;
@@ -119,24 +119,25 @@ function AddPayeeGetBankname(req){
 	return response;
 }
 
-//response for "add-payee-get-accountnumber" intent
+
 function AddPayeeGetAccountnumber(req){
 	const payee = req.body.result.parameters.payee;
 	const response = {
-		"speech": `And along with that I will be needing ${payee}'s 6 digit bank routing number.`,
-		"displayText": `And along with that I will be needing ${payee}'s 6 digit bank routing number.`,
+		"speech": `${payee} has been added successfully in your account.`,
+		"displayText": `${payee} has been added successfully in your account.`,
 		"source": `Opus-NLP`		
 	}
 	return response;
 }
 
-//response for "add-payee-get-routingnumber" intent
-async function AddPayeeGetRoutingnumber(req){
+
+
+async function AddPayeeGetRoutingnumber(req){ 
 	const payee = req.body.result.parameters.payee;
 	//INSERT Query 
 	const response = {
-		"speech": `${payee} has been added successfully in your account.`,
-		"displayText": `${payee} has been added successfully in your account.`,
+		"speech": `Tell me ${payee}'s bank name.`,
+		"displayText": `Tell me ${payee}'s bank name.`,
 		"source": `Opus-NLP`		
 	}
 	return response;

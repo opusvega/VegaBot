@@ -15,7 +15,7 @@ RoutingNumber : ${routingNumber}`;
     var button = {};
     button.title = "Proceed";
     button.type = "postback";                        
-    button.payload = "UID " + parseInt(uid);  
+    button.payload = nickName;  
     fbElementsObj.buttons = [];                    
     fbElementsObj.buttons.push(button);      
     returnJsonObj.messages[0].payload.facebook.attachment.payload.elements.push(fbElementsObj);
