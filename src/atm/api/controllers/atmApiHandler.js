@@ -197,6 +197,7 @@ async function apiHandlerForTrackAtmIncidentGetIncId(req,res){
     console.log("Requested INCID status----->"+INCID);
 
     let rows = await MysqlFunctions.selectIncidentStatus(req);
+    console.log("apiHandlerForTrackAtmIncidentGetIncId=>",rows);
     if(rows != false){
         // let startintentname = 'track-atm-incident';
         // await context.updateContextLogEndIntentName(req,startintentname);

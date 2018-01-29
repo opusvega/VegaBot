@@ -222,7 +222,7 @@ async function apiHandlerForTransferGetOtp(req,res){
 		await mysqlFunctions.updateBalance(req);
 	}
 	else{
-		returnJsonObj.speech = `Your OTP was incorrect. Please try again.`;
+		returnJsonObj.speech = `Your O.T.P. was incorrect. Please try again.`;
 		returnJsonObj.displayText = returnJsonObj.speech;
 	}
 	let speech = returnJsonObj.speech;
@@ -350,7 +350,7 @@ async function apiHandlerForTransferGetPayeeAmountUid(req,res){
 	let otpCode = await nodeMailer.sendOtp(mailId);
 	await mysqlFunctions.updateOTPCode(otpCode,req);
 	let lastDigit = String(contact).substr(-4);
-	returnJsonObj.speech = `We have sent an OTP to your registered email address. Enter it when you receive it`;
+	returnJsonObj.speech = `We have sent an O.T.P. to your registered email address. Enter it when you receive it`;
 	returnJsonObj.displayText = returnJsonObj.speech;
 	let speech = returnJsonObj.speech;
 	let mongoResponse = logConversationHistory(req, returnJsonObj.speech);
@@ -410,9 +410,10 @@ async function apiHandlerForAddPayeeGetBankname(req,res){
 //api handler for "add-payee-get-accountnumber" intent
 async function apiHandlerForAddPayeeGetAccountnumber(req,res){
 	console.log("Entering apiHandlerForAddPayeeGetAccountnumber==========>");
-	let accountNumber = req.body.result.parameters.accountnumber;
+	let accountNumber = req.body.result.parameters.accountnumber.replace(/ /g,'');
+	var numberValidate = /^[A-Za-z]+$/;
 	let returnJsonObj = JSON.parse(JSON.stringify(await stubResponse.AddPayeeGetAccountnumber(req)));
-	if(accountNumber.length != 10){
+	if(accountNumber.length != 10 || accountNumber.match(numberValidate)){
 		returnJsonObj.speech = `Please enter valid 10 digit account number`;
 		returnJsonObj.displayText = returnJsonObj.speech;
 	}
@@ -459,8 +460,9 @@ async function apiHandlerForAddPayeeGetRoutingnumber(req,res){
 	console.log("Entering apiHandlerForAddPayeeGetRoutingnumber==========>");
 	let returnJsonObj = JSON.parse(JSON.stringify( await stubResponse.AddPayeeGetRoutingnumber(req)));
 	//INSERT QUERY
-	let routingNumber = req.body.result.parameters.routingnumber;
-	if (routingNumber.length != 6){
+	let routingNumber = req.body.result.parameters.routingnumber.replace(/ /g,'');
+	var numberValidate = /^[A-Za-z]+$/;
+	if (routingNumber.length != 6 || routingNumber.match(numberValidate)){
 		returnJsonObj.speech = `Please enter valid 6 digit routing number`;
 		returnJsonObj.displayText = returnJsonObj.speech;
 	}

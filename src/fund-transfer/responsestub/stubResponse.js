@@ -51,8 +51,8 @@ function TransferGetUid(payee){
 //response for "transfer-get-amount" intent and "transfer-get-payee-amount" intent
 function TransferGetAmount(contact){
 	const response = {
-		"speech": `We have sent an OTP to your registered mobile ******${contact}. Enter it when you receive it`,
-		"displayText": `We have sent an OTP to your registered mobile number ******${contact}. Enter it when you receive it`,
+		"speech": `We have sent an O.T.P. to your registered mobile ******${contact}. Enter it when you receive it`,
+		"displayText": `We have sent an O.T.P. to your registered mobile number ******${contact}. Enter it when you receive it`,
 		"source": `Opus-NLP`	
 	}
 	return response;
@@ -72,8 +72,8 @@ function TransferGetOtp(req,payee){
 	const currency = req.body.result.parameters.amount.currency.currency;
 	const amount = req.body.result.parameters.amount.currency.amount;
 	const response = {
-		"speech": `Thank You for the OTP.  Your funds amounting ${currency} ${amount} have been transferred to ${payee}.`,
-		"displayText": `Thank You for the OTP.  Your funds amounting ${currency} ${amount} have been transferred to ${payee}.`,
+		"speech": `Thank You for the O.T.P..  Your funds amounting ${currency} ${amount} have been transferred to ${payee}.`,
+		"displayText": `Thank You for the O.T.P..  Your funds amounting ${currency} ${amount} have been transferred to ${payee}.`,
 		"source": `Opus-NLP`		
 	}
 	return response;
