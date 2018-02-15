@@ -1,25 +1,20 @@
 {
-  "name": "remitchatbot",
+  "name": "VegaBot",
   "version": "1.0.0",
-  "description": "A chatbot Server API for fulfilment",
+  "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "remitbot"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/pkul3003/opusremitbot.git"
-  },
-  "keywords": [
-    "Opus",
-    "Bot",
-    "Remit",
-    "Bot"
-  ],
-  "author": "Opus Consulting",
+  "keywords": [],
+  "author": "",
   "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/pkul3003/opusremitbot/issues"
-  },
-  "homepage": "https://github.com/pkul3003/opusremitbot#readme"
+  "dependencies": {
+    "express": "^4.16.2",
+    "mongodb": "^2.2.5",
+    "mysql2": "^1.5.1",
+    "node-cmd": "^3.0.0",
+    "node-rest-client": "^3.1.0",
+    "urlencode": "^1.1.0"
+  }
 }

@@ -1,7 +1,7 @@
-var requestConfig = {
+let requestConfig = {
 };
 
-var PaymentType = {
+let PaymentType = {
         ACH : "Bank account",
         Cash : "Cash",
         CreditCard : "Credit/debit Card"

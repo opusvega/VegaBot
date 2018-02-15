@@ -1,8 +1,8 @@
-var agentLocator_GetCity ={
+let agentLocator_GetCity ={
       "speech": " ",
       "source": "apiai-webhook-sample",
       "displayText": " ",
-      "messages": [
+      "messages": [             
         {
           "type": 4,
           "platform": "facebook",
@@ -51,10 +51,10 @@ var agentLocator_GetCity ={
                   "textToSpeech": "Which agent you want to visit in location Pune from below : \n1) A K TOURS AND TRAVELS, Shop 3 Natasha Enclave \nDistance : 0.01mile. \n2) ACE COMMUNICATONS AND ALLIED S, Shop 17 Suraj Apartment \nDistance : 0.01mile.", "displayText": "Which agent you want to visit in location Pune from below : \n1) A K TOURS AND TRAVELS, Shop 3 Natasha Enclave \nDistance : 0.01mile. \n2) ACE COMMUNICATONS AND ALLIEDS, Shop 17 Suraj Apartment \nDistance : 0.01mile."
                 } 
               } 
-              ]          
-            }       
-            }      
-          }    
-  }
+            ]          
+          }       
+        }      
+      }    
+    }
 
 exports.agentLocator_GetCity = agentLocator_GetCity;

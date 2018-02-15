@@ -1,127 +1,95 @@
-var mysql = require('mysql');
-var config = require("../../../config.js");
+let callmysqlpool = require("../../../mysql-functions/createMysqlSingleton.js");
 
-//mysql connection
-function createMysqlConnection(){
-    var con = mysql.createConnection({
-        host: config.mysqlUrl,
-        user: config.mysqlUser,
-        password: config.mysqlPassword,
-        database : config.mysqldb
-    });
-    return con;
+async function getConnectionPool() {
+  try {
+    return (await callmysqlpool.getPool());
+  }
+  catch (err) {
+    console.log("Error in creating Mysql Pool");
+    return false;
+  }
 }
 
-function insertIncidentLog(req, technicianName){
-    var ATMID = req.body.result.parameters.atmId.atmId;
-    var ISSUE = req.body.result.parameters.issues;
-    var CUSTOMERNAME = req.body.result.parameters.customerName.customerName;
-    var CONTACT = req.body.result.parameters.contact.contact;
-    var TECHNICIAN = technicianName;
-    createMysqlConnection().connect(function(err) {
-        if (err) throw err;
-        else{
-            console.log("Connected!");
-            var sql = "INSERT INTO incidentlog (incid, atmid, issue, status,username, usercontact, inctime, restime) VALUES"+
-                      " (DEFAULT, "+ATMID+", '"+ISSUE+"','In-progress','"+CUSTOMERNAME+"','"+CONTACT+"',NOW(), NOW(), '"+TECHNICIAN+"');";
-            createMysqlConnection().query(sql, function (err, result) {
-                    if (err) throw err;
-                    else console.log("1 record inserted");
-            });
-        }
 
-    });
+//fetching INCID which is just inserted depending on other parameters
+async function selectIncidentId(req){
+    let ATMID = req.body.result.parameters.atmId.atmId;
+    let USERNAME = req.body.result.parameters.customerName.customerName;
+    let CONTACT = req.body.result.parameters.contact.contact;
+    try{    
+        let query = `SELECT incid FROM incidentlog WHERE atmid = ? AND username = ? AND usercontact = ?; `;
+        let pool = await getConnectionPool();
+        let con = await pool.getConnection();
+        let [rows, fields] = await con.execute(query,[ATMID,USERNAME,CONTACT]);
+        con.release();
+        console.log(rows);
+        return rows[0].incid;
+    }
+    catch (err){
+        return false;
+    }
 }
 
-function insertContextLog(req){
-    console.log("Entering insertContextLog----------->");
-    var SESSIONID = req.body.sessionId;
-    var INTENTNAME = req.body.result.metadata.intentName;
-    createMysqlConnection().connect(function(err){
-        if (err) throw err;
-        else{
-            console.log("Connected------insertContextLog");
-            var sqlSelect = "SELECT * FROM contextlog WHERE intentname = '"+INTENTNAME+"' AND sessionid = '"+SESSIONID+"' AND intentcomplete = FALSE;";
-            createMysqlConnection().query(sqlSelect, function (err, rows){
-                if (err) throw err;
-                else{
-                    if(rows.length == 0){
-                        var sql = "INSERT INTO contextlog (id, sessionid, intentname, sessionflag, intentvisit, intentcomplete) VALUES"+
-                                  "(DEFAULT, '"+SESSIONID+"', '"+INTENTNAME+"', DEFAULT, DEFAULT, DEFAULT);";
-                        createMysqlConnection().query(sql, function(err,result){
-                            if (err) throw err;
-                            else{
-                                console.log("1 record inserted in contextlog");
-                                console.log("Exiting insertContextLog----------->");
-                            }
-                        });
-                    }else{
-                        console.log("This entry already exist!")
-                    }
-                }
-            })
-        }
-    });
+//fetching the status of incident from table incidentlog depending on incid provided by user
+async function selectIncidentStatus(req){
+    let INCID = req.body.result.parameters.incid;
+    //let query = "SELECT atmid, issue, DATE_FORMAT(inctime, '%a %d %b %Y %T' ) inctime, status FROM incidentlog WHERE incid = "+INCID;
+    let query = `SELECT atmid, issue, DATE_FORMAT(inctime, '%a %d %b %Y %T' ) inctime, status FROM incidentlog WHERE incid = ?`;
+    try{
+        let pool = await getConnectionPool();
+        let con = await pool.getConnection();
+        let [rows, fields] = await con.execute(query,[INCID]);
+        console.log(rows);
+        con.release();
+        return rows;
+    }
+    catch (err){
+        return false;
+    }
 }
 
-function updateContextLogIntentComplete(req){
-    var SESSIONID = req.body.sessionId;
-    var INTENTNAME = req.body.result.metadata.intentName;
-    createMysqlConnection().connect(function(err){
-        if (err) throw err;
-        else{
-            var sql = "UPDATE contextlog SET intentcomplete = TRUE WHERE sessionid = '"+
-                      SESSIONID+"' AND endintentname = '"+INTENTNAME+"' AND intentcomplete = FALSE;";
-            createMysqlConnection().query(sql, function (err, result){
-                if (err) throw err;
-                else{
-                    console.log(result.affectedRows+" record(s) updated!");
-                }
-            });
-        }
-    });
+//inserting new incident of atm
+async function insertIncidentLog(req, technicianName){
+    let ATMID = req.body.result.parameters.atmId.atmId;
+    let ISSUE = req.body.result.parameters.issues;
+    let CUSTOMERNAME = req.body.result.parameters.customerName.customerName;
+    let CONTACT = req.body.result.parameters.contact.contact;
+    let TECHNICIAN = technicianName;
+    try{
+        let pool = await getConnectionPool();
+        let con = await pool.getConnection();
+        let sql = "INSERT INTO incidentlog (incid, atmid, issue, status,username, usercontact, inctime, restime,technician) VALUES"+
+                          " (DEFAULT, "+ATMID+", '"+ISSUE+"','In-progress','"+CUSTOMERNAME+"','"+CONTACT+"',NOW(), NOW(), '"+TECHNICIAN+"');";
+        let result = await con.query(sql);
+        await con.query("commit;");
+        con.release();
+        console.log(`SUCCESSFULL insertIncidentLog`);
+    }
+    catch (err){
+        console.log(`ERROR in insertIncidentLog ...`)
+    }
+  
+    //return TECHNICIAN;
 }
 
-function updateContextLogEndIntentName(req, startintentname){
-    var SESSIONID = req.body.sessionId;
-    var ENDINTENTNAME = req.body.result.metadata.intentName;
-    var STARTINTENTNAME = startintentname;
-    createMysqlConnection().connect(function(err){
-        if (err) throw err;
-        else{
-            var sql = "UPDATE contextlog SET endintentname = '"+ENDINTENTNAME+"' WHERE sessionid = '"+
-                      SESSIONID+"' AND intentname = '"+STARTINTENTNAME+"' AND intentcomplete = FALSE;";
-            createMysqlConnection().query(sql, function (err, result){
-                if (err) throw err;
-                else{
-                    console.log(result.affectedRows+" record(s) updated!");
-                }
-            });
-        }
-    });
-}
-
-function selectContextLogFalseIntentComplete(req,callback){
-    var SESSIONID = req.body.sessionId;
-    var query = "SELECT intentname FROM contextlog WHERE sessionid = '"+SESSIONID
-               +"' AND sessionflag = TRUE AND intentvisit = TRUE AND intentcomplete = FALSE;";
-    createMysqlConnection().connect(function(err) {
-        if (err) throw err;
-        else{
-            createMysqlConnection().query(query, function (err, rows) {
-                if (err) throw err;
-                else {
-                    console.log(rows);
-                    callback(rows);
-                }
-            });
-        }
-
-    });
+//fetching the context which is just hit by user , whether its entry is already or not
+async function selectContextLogFalseIntentComplete(req,callback){
+    let SESSIONID = req.body.sessionId;
+    let query = `SELECT intentname FROM contextlog WHERE sessionid = ? AND sessionflag = TRUE AND intentvisit = TRUE AND intentcomplete = FALSE;`;
+    try{
+        let pool = await getConnectionPool();
+        let con = await pool.getConnection();
+        let rows = await con.execute(query,[SESSIONID]);
+        console.log(rows);
+        con.release();
+        return rows;
+    }
+    catch (err){
+        return false;
+    }
+    
 }
 
 exports.insertIncidentLog = insertIncidentLog;
-exports.insertContextLog = insertContextLog;
-exports.updateContextLogIntentComplete = updateContextLogIntentComplete;
-exports.selectContextLogFalseIntentComplete = selectContextLogFalseIntentComplete;
-exports.updateContextLogEndIntentName = updateContextLogEndIntentName;
+exports.selectIncidentId = selectIncidentId;
+exports.selectIncidentStatus = selectIncidentStatus;

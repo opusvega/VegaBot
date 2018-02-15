@@ -1,4 +1,4 @@
-var sampleResponseForMTCN =
+let sampleResponseForMTCN =
 {
 "speech": "The status of your transfer is in-progress",
 "displayText": "The status of your transfer is in-progress",

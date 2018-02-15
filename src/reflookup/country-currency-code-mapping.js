@@ -1,4 +1,4 @@
-var countryCurrency = {
+let countryCurrency = {
   AF: 'AFN',
   AX: 'EUR',
   AL: 'ALL',

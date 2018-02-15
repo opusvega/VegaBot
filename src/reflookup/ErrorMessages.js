@@ -1,8 +1,8 @@
-var requestConfig = {
+let requestConfig = {
 };
 
 // Error Handling 
-var ErrorMessages = {
+let ErrorMessages = {
         ERROR_RESPONE_TEXT : "Unable to retrieve the status right now, Please try after some time"
 };
 
