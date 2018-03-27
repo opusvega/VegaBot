@@ -144,20 +144,12 @@ module.exports.apiHandlerForUserLogoutIntent = async (req,res) =>{
 		// }
 		if(user.hasOwnProperty("sessionSummary")){
 			let speech =`Session Summary : \n`;
-			let display =`Session Summary : \n`;
-
 			user.sessionSummary.forEach((sessionObj,index)=> {
 
 			// console.log(`${index+1})`)
 
 			if(sessionObj.intent =="card"){
 				speech += 
-				`${index+1}) Your
-				${sessionObj.type} card ending with
-				${(sessionObj.id %10000).toString().split("").join(" ").toString()} was
-				${sessionObj.action}ed.\n`;
-
-				display += 
 				`${index+1}) Your
 				${sessionObj.type} card ending with
 				${sessionObj.id %10000} was
@@ -167,23 +159,15 @@ module.exports.apiHandlerForUserLogoutIntent = async (req,res) =>{
 			else{
 				speech += `${index +1}) You transferred
 				${sessionObj.currency}
-				${(sessionObj.amount)*(-1)} to
-				${sessionObj.to} having account
-				${(sessionObj.account).split("").join(" ").toString()} in
-				${sessionObj.bank}.\n`;
-
-				display += `${index +1}) You transferred
-				${sessionObj.currency}
-				${(sessionObj.amount)*(-1)} to
+				${sessionObj.amount} to
 				${sessionObj.to} having account
 				${sessionObj.account} in
 				${sessionObj.bank}.\n`;
-
 				}
 			})
 
 			returnJsonObject.speech = speech + returnJsonObject.speech;
-			returnJsonObject.displayText = display+returnJsonObject.displayText;
+			returnJsonObject.displayText = speech+returnJsonObject.displayText;
 		}
 		
 		await mongoHandler.userLogout(req);

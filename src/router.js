@@ -48,6 +48,24 @@ let appRouter = (app) => {
 		if(intentName == "fund.transfer.get.payee.amount.uid.intent"){
 			await apiHandler.apiHandlerForGetPayeeAmountUidIntent(req, res);
 		}
+		if(intentName == "user.card.block.init.intent"){
+			await apiHandler.apiHandlerForUserCardBlockInitIntent(req, res);
+		}
+		if(intentName == "user.card.block.get.id.intent"){
+			await apiHandler.apiHandlerForUserCardBlockGetIdIntent(req, res);
+		}
+		if(intentName == "user.card.block.confirmation.no.intent"){
+			await apiHandler.apiHandlerForCardBlockConfirmationNoIntent(req,res);
+		}
+		if(intentName == "user.card.block.confirmation.yes.intent"){
+			await apiHandler.apiHandlerForCardBlockConfirmationYesIntent(req,res);	
+		}
+		if(intentName == "user.card.block.get.reason.intent"){
+			await apiHandler.apiHandlerForUserCardBlockGetReasonIntent(req,res);
+		}
+		if(intentName == "user.card.unblock.get.answer.intent"){
+			await apiHandler.apiHandlerForUserCardUnblockGetAnswerIntent(req, res);
+		}
 	})
 }
 

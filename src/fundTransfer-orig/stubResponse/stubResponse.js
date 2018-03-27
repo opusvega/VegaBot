@@ -20,8 +20,8 @@ module.exports.stubResponseForLoginIntent = (user) => {
 }
 
 module.exports.stubResponseForLogoutIntent = {
-		"speech" : "You are successfully logged out. Thank you! If you want to continue using Ailene, please key in your username.",
-		"displayText" : "You are successfully logged out. Thank you! If you want to continue using Ailene, please key in your username.",
+		"speech" : "You are successfully logged out. Thank you! If you want to continue using the Vega Bot, please key in your username.",
+		"displayText" : "You are successfully logged out. Thank you! If you want to continue using the Vega Bot, please key in your username.",
 		"contextOut" : [],
 		"source" : "OPUS-NLP"	
 }
